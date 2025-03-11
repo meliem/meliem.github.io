@@ -1,1 +1,1544 @@
-Hello World
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio | Design Créatif</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- GSAP pour les animations avancées -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+    
+    <!-- Locomotive Scroll pour un défilement fluide -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/locomotive-scroll/4.1.4/locomotive-scroll.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/locomotive-scroll/4.1.4/locomotive-scroll.min.js"></script>
+
+    <!-- Three.js pour les effets 3D -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        /* Variables globales */
+        :root {
+            --primary-color: #0f0f0f;
+            --secondary-color: #f1f1f1;
+            --accent-color: #4c6fff;
+            --accent-color-2: #ff4c6f;
+            --text-color: #f1f1f1;
+            --transition-speed: 0.4s;
+        }
+
+        /* Reset et styles de base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Loader */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--primary-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loader-text {
+            font-size: 3rem;
+            font-weight: 700;
+            overflow: hidden;
+        }
+
+        .loader-text span {
+            display: inline-block;
+            transform: translateY(100%);
+        }
+
+        /* Navigation */
+        .navigation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 30px 0;
+            z-index: 100;
+            mix-blend-mode: difference;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo a {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--accent-color);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform var(--transition-speed) ease-out;
+        }
+
+        .nav-links a:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            cursor: pointer;
+            z-index: 101;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 30px;
+            height: 2px;
+            background-color: var(--text-color);
+            margin: 6px 0;
+            transition: all 0.3s;
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            height: 100vh;
+            background-color: var(--primary-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 99;
+            transition: right 0.5s ease;
+        }
+
+        .mobile-menu.active {
+            right: 0;
+        }
+
+        .mobile-menu ul {
+            list-style: none;
+        }
+
+        .mobile-menu li {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .mobile-menu a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 2rem;
+            font-weight: 700;
+            position: relative;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 5vw;
+            font-weight: 700;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .hero-title span {
+            display: inline-block;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 40px;
+            overflow: hidden;
+        }
+
+        .hero-subtitle span {
+            display: inline-block;
+        }
+
+        .hero-cta {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            overflow: hidden;
+            position: relative;
+            transition: background-color var(--transition-speed);
+        }
+
+        .hero-cta::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.7s;
+        }
+
+        .hero-cta:hover {
+            background-color: var(--accent-color-2);
+        }
+
+        .hero-cta:hover::before {
+            left: 100%;
+        }
+
+        #hero-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Glitch Effect */
+        .glitch-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .glitch {
+            position: relative;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.8;
+        }
+
+        .glitch::before {
+            color: var(--accent-color);
+            animation: glitch-effect 3s infinite;
+        }
+
+        .glitch::after {
+            color: var(--accent-color-2);
+            animation: glitch-effect 2s infinite;
+        }
+
+        @keyframes glitch-effect {
+            0% {
+                transform: translate(0);
+            }
+            20% {
+                transform: translate(-3px, 3px);
+            }
+            40% {
+                transform: translate(-3px, -3px);
+            }
+            60% {
+                transform: translate(3px, 3px);
+            }
+            80% {
+                transform: translate(3px, -3px);
+            }
+            100% {
+                transform: translate(0);
+            }
+        }
+
+        /* Projects Section */
+        .projects {
+            padding: 120px 0;
+            position: relative;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            margin-bottom: 80px;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background-color: var(--accent-color);
+        }
+
+        .projects-wrapper {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .project-item {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            height: 400px;
+            cursor: pointer;
+        }
+
+        .project-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .project-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s;
+            filter: grayscale(30%);
+        }
+
+        .project-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+        }
+
+        .project-item:hover .project-overlay {
+            opacity: 1;
+        }
+
+        .project-item:hover .project-image img {
+            transform: scale(1.1);
+            filter: grayscale(0%);
+        }
+
+        .project-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--text-color);
+        }
+
+        .project-category {
+            color: var(--accent-color);
+            margin-bottom: 20px;
+        }
+
+        .project-link {
+            color: var(--text-color);
+            text-decoration: none;
+            border: 2px solid var(--text-color);
+            padding: 8px 20px;
+            border-radius: 30px;
+            transition: all var(--transition-speed);
+        }
+
+        .project-link:hover {
+            background-color: var(--text-color);
+            color: var(--primary-color);
+        }
+
+        /* Reveal Gallery */
+        .reveal-gallery {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 15, 15, 0.95);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+        }
+
+        .reveal-gallery.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .reveal-content {
+            width: 80%;
+            max-width: 1000px;
+        }
+
+        .reveal-image {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .reveal-details {
+            margin-top: 30px;
+            color: var(--text-color);
+        }
+
+        .reveal-close {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            font-size: 2rem;
+            color: var(--text-color);
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        /* About Section */
+        .about {
+            padding: 120px 0;
+            position: relative;
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .about-text {
+            padding-right: 30px;
+        }
+
+        .about-text p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .about-image {
+            position: relative;
+            height: 450px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .about-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(20%);
+            transition: filter 0.5s;
+        }
+
+        .about-image:hover img {
+            filter: grayscale(0%);
+        }
+
+        .skills {
+            margin-top: 40px;
+        }
+
+        .skills-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .skill-item {
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            padding: 8px 15px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            transition: transform 0.3s, background-color 0.3s;
+        }
+
+        .skill-item:hover {
+            transform: translateY(-5px);
+            background-color: var(--accent-color-2);
+        }
+
+        /* Skill Bars */
+        .skill-bars {
+            margin-top: 40px;
+        }
+
+        .skill-bar {
+            margin-bottom: 25px;
+        }
+
+        .skill-bar-title {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .skill-bar-track {
+            height: 8px;
+            width: 100%;
+            background-color: #2a2a2a;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .skill-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-color), var(--accent-color-2));
+            border-radius: 4px;
+            width: 0;
+            transition: width 1.5s ease-out;
+        }
+
+        /* Marquee Text */
+        .marquee-section {
+            padding: 100px 0;
+            overflow: hidden;
+            background-color: #080808;
+        }
+
+        .marquee-wrapper {
+            position: relative;
+            white-space: nowrap;
+        }
+
+        .marquee-text {
+            font-size: 8vw;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: inline-block;
+            padding-right: 50px;
+            animation: marquee 30s linear infinite;
+            background: linear-gradient(90deg, var(--accent-color), var(--accent-color-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        @keyframes marquee {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        /* Contact Section */
+        .contact {
+            padding: 120px 0;
+            position: relative;
+        }
+
+        .contact-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .contact-form {
+            margin-top: 50px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            position: absolute;
+            top: 10px;
+            left: 0;
+            font-weight: 600;
+            color: var(--text-color);
+            opacity: 0.7;
+            transform-origin: left;
+            transition: transform 0.3s, opacity 0.3s;
+        }
+
+        .form-control {
+            width: 100%;
+            background-color: transparent;
+            border: none;
+            border-bottom: 2px solid rgba(241, 241, 241, 0.5);
+            color: var(--text-color);
+            padding: 10px 0;
+            font-size: 1rem;
+            font-family: 'Space Grotesk', sans-serif;
+            transition: border-color var(--transition-speed);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .form-control:focus + label,
+        .form-control:not(:placeholder-shown) + label {
+            transform: translateY(-20px) scale(0.8);
+            opacity: 1;
+            color: var(--accent-color);
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, background-color 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.7s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-5px);
+            background-color: var(--accent-color-2);
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 50px 0;
+            background-color: #080808;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-text {
+            font-size: 0.9rem;
+        }
+
+        .social-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .social-links li {
+            margin-left: 20px;
+        }
+
+        .social-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 1.2rem;
+            transition: color var(--transition-speed), transform 0.3s;
+            display: inline-block;
+        }
+
+        .social-links a:hover {
+            color: var(--accent-color);
+            transform: translateY(-5px);
+        }
+
+        /* Cursor */
+        .custom-cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            mix-blend-mode: difference;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%) scale(1);
+            transition: transform 0.15s ease-out, background-color 0.3s;
+        }
+
+        .cursor-border {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid var(--accent-color);
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%, -50%) scale(1);
+            transition: transform 0.3s ease-out;
+            mix-blend-mode: difference;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--accent-color-2);
+        }
+
+        .theme-toggle-icon {
+            color: var(--text-color);
+            font-size: 1.5rem;
+        }
+
+        body.light-theme {
+            --primary-color: #f5f5f5;
+            --secondary-color: #0f0f0f;
+            --text-color: #0f0f0f;
+            color: var(--text-color);
+            background-color: var(--primary-color);
+        }
+
+        body.light-theme .navigation {
+            mix-blend-mode: normal;
+        }
+
+        body.light-theme .custom-cursor {
+            background-color: var(--accent-color-2);
+        }
+
+        body.light-theme .cursor-border {
+            border-color: var(--accent-color-2);
+        }
+
+        /* Scroll Progress Bar */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: transparent;
+            z-index: 1000;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-color), var(--accent-color-2));
+            width: 0%;
+        }
+
+        /* Media Queries */
+        @media (max-width: 768px) {
+            .about-content {
+                grid-template-columns: 1fr;
+            }
+
+            .about-image {
+                height: 300px;
+            }
+
+            .hero-title {
+                font-size: 10vw;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hamburger {
+                display: block;
+            }
+
+            .hamburger.active span:nth-child(1) {
+                transform: rotate(45deg) translate(5px, 8px);
+            }
+
+            .hamburger.active span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .hamburger.active span:nth-child(3) {
+                transform: rotate(-45deg) translate(5px, -8px);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero-title {
+                font-size: 12vw;
+            }
+
+            .section-title {
+                font-size: 2.2rem;
+            }
+
+            .projects-wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body data-scroll-container>
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- Loader -->
+    <div class="loader">
+        <div class="loader-text">
+            <span>C</span>
+            <span>H</span>
+            <span>A</span>
+            <span>R</span>
+            <span>G</span>
+            <span>E</span>
+            <span>M</span>
+            <span>E</span>
+            <span>N</span>
+            <span>T</span>
+        </div>
+    </div>
+
+    <!-- Custom Cursor -->
+    <div class="custom-cursor"></div>
+    <div class="cursor-border"></div>
+
+    <!-- Theme Toggle -->
+    <div class="theme-toggle" id="themeToggle">
+        <div class="theme-toggle-icon">☀️</div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navigation">
+        <div class="container nav-container">
+            <div class="logo">
+                <a href="#">Mon.Portfolio</a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#" data-scroll-to=".hero">Accueil</a></li>
+                <li><a href="#" data-scroll-to=".projects">Projets</a></li>
+                <li><a href="#" data-scroll-to=".about">À propos</a></li>
+                <li><a href="#" data-scroll-to=".contact">Contact</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <ul>
+            <li><a href="#" data-scroll-to=".hero" class="mobile-link">Accueil</a></li>
+            <li><a href="#" data-scroll-to=".projects" class="mobile-link">Projets</a></li>
+            <li><a href="#" data-scroll-to=".about" class="mobile-link">À propos</a></li>
+            <li><a href="#" data-scroll-to=".contact" class="mobile-link">Contact</a></li>
+        </ul>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero" data-scroll-section>
+        <canvas id="hero-canvas"></canvas>
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <span class="glitch-wrapper"><span class="glitch" data-text="Designer">Designer</span></span> &
+                <span class="glitch-wrapper"><span class="glitch" data-text="Développeur">Développeur</span></span>
+            </h1>
+            <p class="hero-subtitle">
+                <span>Créant des expériences numériques impressionnantes</span>
+            </p>
+            <a href="#" class="hero-cta" data-scroll-to=".projects">Voir mon travail</a>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section class="projects" data-scroll-section>
+        <div class="container">
+            <h2 class="section-title" data-scroll data-scroll-speed="1">Mes Projets</h2>
+            <div class="projects-wrapper">
+                <!-- Project 1 -->
+                <div class="project-item" data-scroll data-scroll-speed="2" data-project="1">
+                    <div class="project-image">
+                        <img src="/api/placeholder/600/400" alt="Projet 1">
+                    </div>
+                    <div class="project-overlay">
+                        <h3 class="project-title">Site E-commerce</h3>
+                        <p class="project-category">Développement web</p>
+                        <button class="project-link project-view" data-project="1">Voir le projet</button>
+                    </div>
+                </div>
+                <!-- Project 2 -->
+                <div class="project-item" data-scroll data-scroll-speed="1.5" data-project="2">
+                    <div class="project-image">
+                        <img src="/api/placeholder/600/400" alt="Projet 2">
+                    </div>
+                    <div class="project-overlay">
+                        <h3 class="project-title">Application Mobile</h3>
+                        <p class="project-category">Design UI/UX</p>
+                        <button class="project-link project-view" data-project="2">Voir le projet</button>
+                    </div>
+                </div>
+                <!-- Project 3 -->
+                <div class="project-item" data-scroll data-scroll-speed="1.8" data-project="3">
+                    <div class="project-image">
+                        <img src="/api/placeholder/600/400" alt="Projet 3">
+                    </div>
+                    <div class="project-overlay">
+                        <h3 class="project-title">Identité de Marque</h3>
+                        <p class="project-category">Branding</p>
+                        <button class="project-link project-view" data-project="3">Voir le projet</button>
+                    </div>
+                </div>
+                <!-- Project 4 -->
+                <div class="project-item" data-scroll data-scroll-speed="2" data-project="4">
+                    <div class="project-image">
+                        <img src="/api/placeholder/600/400" alt="Projet 4">
+                    </div>
+                    <div class="project-overlay">
+                        <h3 class="project-title">Visualisation 3D</h3>
+                        <p class="project-category">Three.js</p>
+                        <button class="project-link project-view" data-project="4">Voir le projet</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Project Reveal Gallery -->
+    <div class="reveal-gallery" id="revealGallery">
+        <button class="reveal-close" id="revealClose">×</button>
+        <div class="reveal-content">
+            <img src="/api/placeholder/1000/600" alt="Projet" class="reveal-image" id="revealImage">
+            <div class="reveal-details">
+                <h2 id="revealTitle">Titre du projet</h2>
+                <p id="revealDescription">Description du projet...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Marquee Section -->
+    <section class="marquee-section" data-scroll-section>
+        <div class="marquee-wrapper">
+            <div class="marquee-text">Créativité • Innovation • Excellence • Passion</div>
+            <div class="marquee-text">Créativité • Innovation • Excellence • Passion</div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about" data-scroll-section>
+        <div class="container">
+            <h2 class="section-title" data-scroll data-scroll-speed="1">À propos</h2>
+            <div class="about-content">
+                <div class="about-text" data-scroll data-scroll-speed="1">
+                    <p>Bonjour, je suis [Votre nom], designer et développeur passionné par la création d'expériences numériques uniques et mémorables.</p>
+                    <p>Avec une expertise en design UI/UX et en développement front-end, je combine créativité et compétences techniques pour donner vie à des projets ambitieux.</p>
+                    <p>Mon approche est centrée sur l'utilisateur, avec une attention particulière portée aux détails et à l'innovation.</p>
+                    
+                    <!-- Skill Bars -->
+                    <div class="skill-bars">
+                        <div class="skill-bar">
+                            <div class="skill-bar-title">
+                                <span>HTML/CSS</span>
+                                <span>95%</span>
+                            </div>
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill" data-width="95"></div>
+                            </div>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-bar-title">
+                                <span>JavaScript</span>
+                                <span>90%</span>
+                            </div>
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill" data-width="90"></div>
+                            </div>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-bar-title">
+                                <span>React</span>
+                                <span>85%</span>
+                            </div>
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill" data-width="85"></div>
+                            </div>
+                        </div>
+                        <div class="skill-bar">
+                            <div class="skill-bar-title">
+                                <span>UI/UX Design</span>
+                                <span>88%</span>
+                            </div>
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill" data-width="88"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="skills">
+                        <h3 class="skills-title">Compétences</h3>
+                        <div class="skills-list">
+                            <span class="skill-item">HTML5</span>
+                            <span class="skill-item">CSS3</span>
+                            <span class="skill-item">JavaScript</span>
+                            <span class="skill-item">React</span>
+                            <span class="skill-item">GSAP</span>
+                            <span class="skill-item">Three.js</span>
+                            <span class="skill-item">Figma</span>
+                            <span class="skill-item">Photoshop</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-image" data-scroll data-scroll-speed="2">
+                    <img src="/api/placeholder/600/800" alt="Votre photo">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" data-scroll-section>
+        <div class="container contact-container">
+            <h2 class="section-title" data-scroll data-scroll-speed="1">Contact</h2>
+            <form class="contact-form" data-scroll data-scroll-speed="1.5">
+                <div class="form-group">
+                    <input type="text" id="name" class="form-control" placeholder=" " required>
+                    <label for="name">Nom</label>
+                </div>
+                <div class="form-group">
+                    <input type="email" id="email" class="form-control" placeholder=" " required>
+                    <label for="email">Email</label>
+                </div>
+                <div class="form-group">
+                    <textarea id="message" class="form-control" placeholder=" " required></textarea>
+                    <label for="message">Message</label>
+                </div>
+                <button type="submit" class="submit-btn">Envoyer</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" data-scroll-section>
+        <div class="container footer-content">
+            <p class="footer-text">&copy; 2025 Votre Nom. Tous droits réservés.</p>
+            <ul class="social-links">
+                <li><a href="#">LinkedIn</a></li>
+                <li><a href="#">GitHub</a></li>
+                <li><a href="#">Dribbble</a></li>
+                <li><a href="#">Instagram</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Variables pour le cursor
+            const cursor = document.querySelector('.custom-cursor');
+            const cursorBorder = document.querySelector('.cursor-border');
+            
+            // Variable pour ThreeJS
+            let scene, camera, renderer, particlesMesh;
+            
+            // Initialisation des éléments DOM
+            const hamburger = document.getElementById('hamburger');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileLinks = document.querySelectorAll('.mobile-link');
+            const themeToggle = document.getElementById('themeToggle');
+            const progressBar = document.getElementById('progressBar');
+            const revealGallery = document.getElementById('revealGallery');
+            const revealClose = document.getElementById('revealClose');
+            const revealImage = document.getElementById('revealImage');
+            const revealTitle = document.getElementById('revealTitle');
+            const revealDescription = document.getElementById('revealDescription');
+            const projectViewButtons = document.querySelectorAll('.project-view');
+            
+            // Données des projets pour la galerie
+            const projectsData = [
+                {
+                    id: 1,
+                    title: "Site E-commerce",
+                    description: "Un site e-commerce moderne avec panier d'achat, paiement sécurisé et interface utilisateur intuitive. Développé avec React et Node.js.",
+                    image: "/api/placeholder/1000/600"
+                },
+                {
+                    id: 2,
+                    title: "Application Mobile",
+                    description: "Une application mobile élégante et performante pour iOS et Android. Design UI/UX moderne et expérience utilisateur fluide.",
+                    image: "/api/placeholder/1000/600"
+                },
+                {
+                    id: 3,
+                    title: "Identité de Marque",
+                    description: "Création complète d'identité visuelle pour une startup innovante, comprenant logo, palette de couleurs, typographie et supports marketing.",
+                    image: "/api/placeholder/1000/600"
+                },
+                {
+                    id: 4,
+                    title: "Visualisation 3D",
+                    description: "Expérience 3D interactive pour présenter un produit avec animations et rendus de haute qualité, développée avec Three.js.",
+                    image: "/api/placeholder/1000/600"
+                }
+            ];
+            
+            // Initialisation du scroll fluide
+            const scroll = new LocomotiveScroll({
+                el: document.querySelector('[data-scroll-container]'),
+                smooth: true,
+                multiplier: 1,
+                smartphone: {
+                    smooth: true
+                },
+                tablet: {
+                    smooth: true
+                }
+            });
+            
+            // Mise à jour de Locomotive Scroll pour les animations GSAP
+            scroll.on('scroll', ScrollTrigger.update);
+            
+            // Configuration de ScrollTrigger pour fonctionner avec Locomotive Scroll
+            ScrollTrigger.scrollerProxy('[data-scroll-container]', {
+                scrollTop(value) {
+                    return arguments.length ? scroll.scrollTo(value, 0, 0) : scroll.scroll.instance.scroll.y;
+                },
+                getBoundingClientRect() {
+                    return {top: 0, left: 0, width: window.innerWidth, height: window.innerHeight};
+                },
+                pinType: document.querySelector('[data-scroll-container]').style.transform ? "transform" : "fixed"
+            });
+            
+            // Animation du loader
+            const loaderAnimation = gsap.timeline({
+                onComplete: () => {
+                    gsap.to('.loader', {
+                        opacity: 0,
+                        duration: 0.5,
+                        onComplete: () => {
+                            document.querySelector('.loader').style.display = 'none';
+                            // Démarrer les animations après que le loader disparaît
+                            initAnimations();
+                        }
+                    });
+                }
+            });
+            
+            loaderAnimation
+                .to('.loader-text span', {
+                    y: 0,
+                    stagger: 0.05,
+                    duration: 0.8,
+                    ease: 'power3.out'
+                })
+                .to('.loader-text span', {
+                    y: '-100%',
+                    stagger: 0.05,
+                    duration: 0.8,
+                    delay: 0.5,
+                    ease: 'power3.in'
+                });
+            
+            // Initialisation des animations
+            function initAnimations() {
+                // Animation du héros
+                const heroAnimation = gsap.timeline();
+                heroAnimation
+                    .from('.hero-title span', {
+                        y: 100,
+                        opacity: 0,
+                        stagger: 0.1,
+                        duration: 1,
+                        ease: 'power3.out'
+                    })
+                    .from('.hero-subtitle span', {
+                        y: 50,
+                        opacity: 0,
+                        duration: 0.8,
+                        ease: 'power3.out'
+                    }, '-=0.2')
+                    .from('.hero-cta', {
+                        y: 50,
+                        opacity: 0,
+                        duration: 0.8,
+                        ease: 'power3.out'
+                    }, '-=0.2');
+                
+                // Animation des sections au scroll
+                gsap.utils.toArray('[data-scroll-section]').forEach((section, i) => {
+                    if (i > 0) { // Skip hero section
+                        gsap.from(section, {
+                            opacity: 0,
+                            y: 50,
+                            duration: 1,
+                            scrollTrigger: {
+                                trigger: section,
+                                scroller: '[data-scroll-container]',
+                                start: 'top 80%',
+                                end: 'top 50%',
+                                scrub: 1
+                            }
+                        });
+                    }
+                });
+                
+                // Animation des barres de compétence
+                const skillBars = document.querySelectorAll('.skill-bar-fill');
+                skillBars.forEach(bar => {
+                    const width = bar.getAttribute('data-width');
+                    gsap.to(bar, {
+                        width: `${width}%`,
+                        duration: 1.5,
+                        scrollTrigger: {
+                            trigger: bar,
+                            scroller: '[data-scroll-container]',
+                            start: 'top 90%',
+                            end: 'top 60%',
+                            scrub: false,
+                            once: true
+                        }
+                    });
+                });
+                
+                // Animation des projets
+                gsap.utils.toArray('.project-item').forEach((project, i) => {
+                    gsap.from(project, {
+                        y: 100,
+                        opacity: 0,
+                        duration: 1,
+                        delay: i * 0.2,
+                        scrollTrigger: {
+                            trigger: '.projects',
+                            scroller: '[data-scroll-container]',
+                            start: 'top 80%',
+                            end: 'top 50%',
+                            scrub: false,
+                            once: true
+                        }
+                    });
+                });
+            }
+            
+            // Initialisation de Three.js pour le canvas héro
+            function initThreeJS() {
+                const canvas = document.getElementById('hero-canvas');
+                
+                scene = new THREE.Scene();
+                camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                camera.position.z = 5;
+                
+                renderer = new THREE.WebGLRenderer({
+                    canvas: canvas,
+                    alpha: true
+                });
+                renderer.setPixelRatio(window.devicePixelRatio);
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                
+                // Création des particules
+                const particlesGeometry = new THREE.BufferGeometry();
+                const particlesCount = 2000;
+                
+                const posArray = new Float32Array(particlesCount * 3);
+                
+                for(let i = 0; i < particlesCount * 3; i++) {
+                    posArray[i] = (Math.random() - 0.5) * 10;
+                }
+                
+                particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+                
+                // Création d'un matériau pour les particules
+                const particlesMaterial = new THREE.PointsMaterial({
+                    size: 0.015,
+                    color: 0x4c6fff,
+                    transparent: true,
+                    opacity: 0.8
+                });
+                
+                // Création du mesh de particules
+                particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+                scene.add(particlesMesh);
+                
+                animate();
+                
+                // Responsive
+                window.addEventListener('resize', () => {
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+            }
+            
+            // Animation Three.js
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                particlesMesh.rotation.x += 0.0003;
+                particlesMesh.rotation.y += 0.0005;
+                
+                // Animation sur la position de la souris
+                if (window.mouseX && window.mouseY) {
+                    particlesMesh.rotation.x += (window.mouseY * 0.00001);
+                    particlesMesh.rotation.y += (window.mouseX * 0.00001);
+                }
+                
+                renderer.render(scene, camera);
+            }
+            
+            // Gestion du curseur personnalisé
+            document.addEventListener('mousemove', (e) => {
+                window.mouseX = e.clientX;
+                window.mouseY = e.clientY;
+                
+                // Animation du curseur personnalisé avec GSAP
+                gsap.to(cursor, {
+                    x: e.clientX,
+                    y: e.clientY,
+                    duration: 0.1
+                });
+                
+                gsap.to(cursorBorder, {
+                    x: e.clientX,
+                    y: e.clientY,
+                    duration: 0.3
+                });
+            });
+            
+            // Effet de survol sur les liens et les boutons
+            const interactiveElements = document.querySelectorAll('a, button, .project-item, .skill-item');
+            interactiveElements.forEach(element => {
+                element.addEventListener('mouseenter', () => {
+                    gsap.to(cursor, {
+                        scale: 1.5,
+                        backgroundColor: 'var(--accent-color-2)',
+                        duration: 0.3
+                    });
+                    gsap.to(cursorBorder, {
+                        scale: 1.5,
+                        borderColor: 'var(--accent-color-2)',
+                        duration: 0.3
+                    });
+                });
+                
+                element.addEventListener('mouseleave', () => {
+                    gsap.to(cursor, {
+                        scale: 1,
+                        backgroundColor: 'var(--accent-color)',
+                        duration: 0.3
+                    });
+                    gsap.to(cursorBorder, {
+                        scale: 1,
+                        borderColor: 'var(--accent-color)',
+                        duration: 0.3
+                    });
+                });
+                
+                element.addEventListener('mousedown', () => {
+                    gsap.to(cursor, {
+                        scale: 0.9,
+                        duration: 0.1
+                    });
+                });
+                
+                element.addEventListener('mouseup', () => {
+                    gsap.to(cursor, {
+                        scale: 1.5,
+                        duration: 0.1
+                    });
+                });
+            });
+            
+            // Gestion du menu hamburger
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                mobileMenu.classList.toggle('active');
+            });
+            
+            // Fermeture du menu mobile lors du clic sur un lien
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    hamburger.classList.remove('active');
+                    mobileMenu.classList.remove('active');
+                });
+            });
+            
+            // Changement de thème
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('light-theme');
+                
+                // Changer l'icône du toggle
+                const icon = themeToggle.querySelector('.theme-toggle-icon');
+                if (document.body.classList.contains('light-theme')) {
+                    icon.textContent = '🌙';
+                } else {
+                    icon.textContent = '☀️';
+                }
+                
+                // Actualiser Locomotive Scroll après le changement de thème
+                scroll.update();
+            });
+            
+            // Mise à jour de la barre de progression au scroll
+            window.addEventListener('scroll', () => {
+                const scrollPosition = document.documentElement.scrollTop;
+                const totalHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const progress = (scrollPosition / totalHeight) * 100;
+                progressBar.style.width = progress + '%';
+            });
+            
+            // Navigation smooth scroll
+            document.querySelectorAll('[data-scroll-to]').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const target = document.querySelector(link.getAttribute('data-scroll-to'));
+                    scroll.scrollTo(target);
+                });
+            });
+            
+            // Gestion de la galerie de projets
+            projectViewButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const projectId = parseInt(button.getAttribute('data-project'));
+                    const project = projectsData.find(p => p.id === projectId);
+                    
+                    revealImage.src = project.image;
+                    revealTitle.textContent = project.title;
+                    revealDescription.textContent = project.description;
+                    
+                    // Animation d'ouverture
+                    gsap.fromTo(revealGallery, 
+                        { opacity: 0 }, 
+                        { opacity: 1, duration: 0.5, ease: 'power2.out' }
+                    );
+                    revealGallery.classList.add('active');
+                    
+                    // Animation du contenu
+                    gsap.fromTo('.reveal-content', 
+                        { y: 50, opacity: 0 }, 
+                        { y: 0, opacity: 1, duration: 0.5, delay: 0.2, ease: 'power2.out' }
+                    );
+                });
+            });
+            
+            // Fermeture de la galerie
+            revealClose.addEventListener('click', () => {
+                gsap.to(revealGallery, {
+                    opacity: 0, 
+                    duration: 0.5, 
+                    ease: 'power2.in',
+                    onComplete: () => {
+                        revealGallery.classList.remove('active');
+                    }
+                });
+            });
+            
+            // Initialisation de Three.js
+            initThreeJS();
+        });
+    </script>
+</body>
+</html>
