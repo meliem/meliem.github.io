@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Elie Maby - Portfolio</title>
-    <meta name="description" content="Portfolio professionnel d'Elie Maby - Data Engineer, développeur et spécialiste en électronique">
+    <meta name="description" content="Portfolio interactif d'Elie Maby - Ingénieur, développeur et spécialiste en électronique">
     
     <!-- Favicon -->
     <link rel="icon" href="assets/img/favicon.ico">
@@ -17,35 +17,30 @@
     <!-- Font Awesome pour les icônes -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
-    <!-- Solution de secours pour assurer la visibilité du contenu -->
-    <style>
-        /* Ces styles s'assurent que le contenu reste visible même si JavaScript ne charge pas correctement */
-        body, section, .container, .hero-content, .about-content, 
-        .timeline, .projects-grid, .skills-content, 
-        .achievements-content, .contact-content {
-            opacity: 1 !important;
-            visibility: visible !important;
-        }
-        
-        /* Désactiver les transformations initiales qui pourraient cacher le contenu */
-        .fade-in, .fade-in-left, .fade-in-right, .scale-in {
-            transform: none !important;
-            opacity: 1 !important;
-        }
-        
-        /* Ces styles seront écrasés par JavaScript si tout fonctionne bien */
-        .js-enabled .fade-in, .js-enabled .fade-in-left, 
-        .js-enabled .fade-in-right, .js-enabled .scale-in {
-            /* JavaScript réappliquera les animations */
-        }
-    </style>
+    <!-- GSAP pour les animations avancées -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 </head>
-<body>
+<body class="page-home">
+    <!-- Overlay de transition entre les pages -->
+    <div class="page-transition-overlay"></div>
+    
+    <!-- Préloader -->
+    <div class="preloader">
+        <div class="loader">
+            <svg class="logo-animation" width="100" height="100" viewBox="0 0 100 100">
+                <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" class="logo-text">EM</text>
+                <circle class="circle" cx="50" cy="50" r="40" fill="none" stroke-width="3"></circle>
+            </svg>
+            <p class="loading-text">Chargement<span class="dots">...</span></p>
+        </div>
+    </div>
+    
     <!-- Navigation -->
     <nav id="navbar">
         <div class="container">
             <div class="logo">
-                <a href="#home">EM</a>
+                <a href="index.html">EM</a>
             </div>
             <div class="nav-toggle">
                 <span></span>
@@ -53,440 +48,137 @@
                 <span></span>
             </div>
             <ul class="nav-links">
-                <li><a href="#home">Accueil</a></li>
-                <li><a href="#about">À propos</a></li>
-                <li><a href="#experience">Expérience</a></li>
-                <li><a href="#education">Formation</a></li>
-                <li><a href="#projects">Projets</a></li>
-                <li><a href="#skills">Compétences</a></li>
-                <li><a href="#contact">Contact</a></li>
+                <li><a href="index.html" class="active">Accueil</a></li>
+                <li><a href="about.html">À propos</a></li>
+                <li><a href="experience.html">Parcours</a></li>
+                <li><a href="projects.html">Projets</a></li>
+                <li><a href="skills.html">Compétences</a></li>
+                <li><a href="contact.html">Contact</a></li>
             </ul>
         </div>
     </nav>
     
+    <!-- Canvas pour les effets de particules -->
+    <canvas id="particles-canvas"></canvas>
+    
     <!-- Hero Section -->
-    <section id="home" class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h1>Elie Maby</h1>
-                <h2>Data Engineer & <span class="typed-text"></span></h2>
-                <p>Passionné par la data, la cybersécurité et l'électronique</p>
-                <div class="hero-buttons">
-                    <a href="#contact" class="btn btn-primary">Me contacter</a>
-                    <a href="#projects" class="btn btn-secondary">Voir mes projets</a>
-                </div>
-                <div class="social-links">
-                    <a href="https://www.linkedin.com/in/elie-maby-a511b51b2/" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
-                    <a href="https://www.kaggle.com/kgrou0" target="_blank" title="Kaggle"><i class="fab fa-kaggle"></i></a>
-                    <a href="https://github.com/" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
-                </div>
+    <section class="hero fullscreen-section">
+        <div class="hero-content">
+            <div class="glitch-container">
+                <h1 class="glitch" data-text="Elie Maby">Elie Maby</h1>
+            </div>
+            <div class="typing-container">
+                <h2>Je suis <span class="typed-text"></span></h2>
+            </div>
+            <p class="hero-subtitle">Ingénieur, développeur, électronicien</p>
+            
+            <div class="cta-buttons">
+                <a href="projects.html" class="btn btn-primary">
+                    <span class="btn-text">Voir mes projets</span>
+                    <span class="btn-icon"><i class="fas fa-arrow-right"></i></span>
+                </a>
+                <a href="contact.html" class="btn btn-secondary">
+                    <span class="btn-text">Me contacter</span>
+                    <span class="btn-icon"><i class="fas fa-envelope"></i></span>
+                </a>
+            </div>
+            
+            <div class="social-links">
+                <a href="https://www.linkedin.com/in/elie-maby-a511b51b2/" target="_blank" class="social-icon linkedin">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
+                <a href="https://www.kaggle.com/kgrou0" target="_blank" class="social-icon kaggle">
+                    <i class="fab fa-kaggle"></i>
+                </a>
+                <a href="https://github.com/" target="_blank" class="social-icon github">
+                    <i class="fab fa-github"></i>
+                </a>
             </div>
         </div>
-        <div class="scroll-down">
-            <a href="#about"><i class="fas fa-chevron-down"></i></a>
+        
+        <div class="hero-background">
+            <div class="circuit-board"></div>
+            <div class="data-flow"></div>
         </div>
-    </section>
-    
-    <!-- About Section -->
-    <section id="about" class="about">
-        <div class="container">
-            <div class="section-title">
-                <h2>À propos de moi</h2>
-                <div class="underline"></div>
-            </div>
-            <div class="about-content">
-                <div class="about-img">
-                    <div class="img-container">
-                        <img src="assets/img/profile.jpg" alt="Elie Maby">
-                    </div>
-                </div>
-                <div class="about-text">
-                    <h3>Qui suis-je?</h3>
-                    <p>Je suis Elie Maby, un ingénieur passionné par la data, la cybersécurité et l'électronique. Actuellement Assistant Data Engineer chez Crédit Mutuel Arkéa, je poursuis également mes études d'ingénieur à l'Institut supérieur d'électronique et du numérique.</p>
-                    <p>Je suis auto-entrepreneur dans le domaine de l'électronique depuis 2021, avec une expertise en réparation, reconditionnement et récupération de données.</p>
-                    <p>Mon parcours diversifié m'a permis d'acquérir des compétences solides en développement logiciel, intelligence artificielle, réseaux et cybersécurité.</p>
-                    <div class="personal-info">
-                        <div class="info-item">
-                            <span>Localisation:</span>
-                            <span>Brest, Bretagne, France</span>
-                        </div>
-                        <div class="info-item">
-                            <span>Freelance:</span>
-                            <span>Disponible</span>
-                        </div>
-                    </div>
-                    <a href="#" class="btn btn-primary" id="download-cv">Télécharger mon CV</a>
-                </div>
+        
+        <div class="scroll-indicator">
+            <span class="scroll-text">Explorer</span>
+            <div class="scroll-arrow">
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
         </div>
     </section>
     
-    <!-- Experience Section -->
-    <section id="experience" class="experience">
+    <!-- Navigation visuelle avec aperçu -->
+    <section class="visual-navigation">
         <div class="container">
             <div class="section-title">
-                <h2>Expérience professionnelle</h2>
+                <h2>Explorer mon univers</h2>
                 <div class="underline"></div>
             </div>
-            <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-date">Septembre 2024 - Présent</div>
-                        <h3>Assistant Data Engineer</h3>
-                        <h4>Crédit Mutuel Arkéa - Apprentissage</h4>
-                        <p>Brest, Bretagne, France</p>
-                        <ul>
-                            <li>Développement et maintenance d'infrastructures de données</li>
-                            <li>Conception de pipelines ETL</li>
-                            <li>Optimisation des requêtes et performances des bases de données</li>
-                        </ul>
+            
+            <div class="nav-cards">
+                <a href="about.html" class="nav-card" data-content="À propos">
+                    <div class="card-content">
+                        <div class="card-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h3>À propos</h3>
+                        <p>Découvrez mon parcours et ma personnalité</p>
                     </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-date">Mai 2021 - Présent</div>
-                        <h3>Auto-entrepreneur - Électronique</h3>
-                        <h4>Indépendant</h4>
-                        <p>Hybride</p>
-                        <ul>
-                            <li>Réparation d'appareils électroniques</li>
-                            <li>Reconditionnement de matériel informatique</li>
-                            <li>Récupération de données</li>
-                            <li>Conseils et maintenance</li>
-                        </ul>
+                    <div class="card-overlay"></div>
+                </a>
+                
+                <a href="experience.html" class="nav-card" data-content="Parcours">
+                    <div class="card-content">
+                        <div class="card-icon">
+                            <i class="fas fa-road"></i>
+                        </div>
+                        <h3>Parcours</h3>
+                        <p>Mon expérience professionnelle et académique</p>
                     </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-date">Septembre 2022 - Août 2023</div>
-                        <h3>Chef de projet logiciel et réseau</h3>
-                        <h4>Alkivi - Apprentissage</h4>
-                        <p>Lille, Hauts-de-France, France</p>
-                        <ul>
-                            <li>Gestion de projets informatiques</li>
-                            <li>Administration Microsoft Azure</li>
-                            <li>Configuration Apple Business Manager</li>
-                            <li>Gestion de déploiements logiciels</li>
-                        </ul>
+                    <div class="card-overlay"></div>
+                </a>
+                
+                <a href="projects.html" class="nav-card" data-content="Projets">
+                    <div class="card-content">
+                        <div class="card-icon">
+                            <i class="fas fa-code-branch"></i>
+                        </div>
+                        <h3>Projets</h3>
+                        <p>Explorez mes réalisations techniques</p>
                     </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-date">Septembre 2020 - Septembre 2022</div>
-                        <h3>Apprenti GEII</h3>
-                        <h4>ENGIE Solutions France - Apprentissage</h4>
-                        <p>Brest, Bretagne, France</p>
-                        <ul>
-                            <li>Missions au sein de l'ifremer Plouzanné, CIN Brest, Pyrotechnie Brest, Alcatel Lucent Brest, La Poste Finistère, Le Quartz Brest</li>
-                            <li>Développement d'une GTC provisoire pour l'Institut Polaire Français</li>
-                            <li>Électronique et automatisation industrielle</li>
-                        </ul>
+                    <div class="card-overlay"></div>
+                </a>
+                
+                <a href="skills.html" class="nav-card" data-content="Compétences">
+                    <div class="card-content">
+                        <div class="card-icon">
+                            <i class="fas fa-cogs"></i>
+                        </div>
+                        <h3>Compétences</h3>
+                        <p>Technologies et savoir-faire</p>
                     </div>
-                </div>
+                    <div class="card-overlay"></div>
+                </a>
+                
+                <a href="contact.html" class="nav-card" data-content="Contact">
+                    <div class="card-content">
+                        <div class="card-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <h3>Contact</h3>
+                        <p>Discutons de vos projets</p>
+                    </div>
+                    <div class="card-overlay"></div>
+                </a>
             </div>
         </div>
     </section>
     
-    <!-- Education Section -->
-    <section id="education" class="education">
-        <div class="container">
-            <div class="section-title">
-                <h2>Formation</h2>
-                <div class="underline"></div>
-            </div>
-            <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-date">Septembre 2024 - Août 2027</div>
-                        <h3>Diplôme d'ingénieur, Informatique</h3>
-                        <h4>Institut supérieur d'électronique et du numérique</h4>
-                        <p>En cours</p>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-date">Janvier 2024 - Mai 2024</div>
-                        <h3>Chef de projet en intelligence artificielle, IT</h3>
-                        <h4>DataScientest.com</h4>
-                        <p>Compétences: Linux, Apprentissage automatique, Python, Data</p>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-date">Septembre 2022 - Septembre 2023</div>
-                        <h3>Licence, informatique et réseau / cybersecurity</h3>
-                        <h4>ESGI</h4>
-                        <p>Compétences: C++, Linux, Python, C, Cybersécurité</p>
-                        <p>Projet: développement d'un IDS avec détection de menaces par réseau neuronal sur le dataset UNB CICIDS2017</p>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-date">Septembre 2020 - Août 2022</div>
-                        <h3>DUT GEII, Informatique industrielle</h3>
-                        <h4>IUT Brest Morlaix</h4>
-                        <p>Compétences: Électronique, Automatisation industrielle</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- Projects Section -->
-    <section id="projects" class="projects">
-        <div class="container">
-            <div class="section-title">
-                <h2>Projets</h2>
-                <div class="underline"></div>
-            </div>
-            <div class="projects-filter">
-                <button class="filter-btn active" data-filter="all">Tous</button>
-                <button class="filter-btn" data-filter="data">Data Science</button>
-                <button class="filter-btn" data-filter="dev">Développement</button>
-                <button class="filter-btn" data-filter="cyber">Cybersécurité</button>
-                <button class="filter-btn" data-filter="electronics">Électronique</button>
-            </div>
-            <div class="projects-grid" id="projects-grid">
-                <!-- Projects will be loaded dynamically from projects.js -->
-            </div>
-        </div>
-    </section>
-    
-    <!-- Skills Section -->
-    <section id="skills" class="skills">
-        <div class="container">
-            <div class="section-title">
-                <h2>Compétences</h2>
-                <div class="underline"></div>
-            </div>
-            <div class="skills-content">
-                <div class="skills-category">
-                    <h3>Langages de programmation</h3>
-                    <div class="skills-list">
-                        <div class="skill-item">
-                            <div class="skill-name">Python</div>
-                            <div class="skill-bar">
-                                <div class="skill-progress" data-progress="90"></div>
-                            </div>
-                        </div>
-                        <div class="skill-item">
-                            <div class="skill-name">C/C++</div>
-                            <div class="skill-bar">
-                                <div class="skill-progress" data-progress="75"></div>
-                            </div>
-                        </div>
-                        <div class="skill-item">
-                            <div class="skill-name">JavaScript</div>
-                            <div class="skill-bar">
-                                <div class="skill-progress" data-progress="70"></div>
-                            </div>
-                        </div>
-                        <div class="skill-item">
-                            <div class="skill-name">SQL</div>
-                            <div class="skill-bar">
-                                <div class="skill-progress" data-progress="85"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="skills-category">
-                    <h3>Data Science & IA</h3>
-                    <div class="skills-list">
-                        <div class="skill-item">
-                            <div class="skill-name">Machine Learning</div>
-                            <div class="skill-bar">
-                                <div class="skill-progress" data-progress="80"></div>
-                            </div>
-                        </div>
-                        <div class="skill-item">
-                            <div class="skill-name">Data Analysis</div>
-                            <div class="skill-bar">
-                                <div class="skill-progress" data-progress="85"></div>
-                            </div>
-                        </div>
-                        <div class="skill-item">
-                            <div class="skill-name">Neural Networks</div>
-                            <div class="skill-bar">
-                                <div class="skill-progress" data-progress="75"></div>
-                            </div>
-                        </div>
-                        <div class="skill-item">
-                            <div class="skill-name">ETL Pipelines</div>
-                            <div class="skill-bar">
-                                <div class="skill-progress" data-progress="85"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="skills-category">
-                    <h3>Cybersécurité</h3>
-                    <div class="skills-list">
-                        <div class="skill-item">
-                            <div class="skill-name">Détection d'intrusion</div>
-                            <div class="skill-bar">
-                                <div class="skill-progress" data-progress="80"></div>
-                            </div>
-                        </div>
-                        <div class="skill-item">
-                            <div class="skill-name">Forensique</div>
-                            <div class="skill-bar">
-                                <div class="skill-progress" data-progress="70"></div>
-                            </div>
-                        </div>
-                        <div class="skill-item">
-                            <div class="skill-name">Sécurité réseau</div>
-                            <div class="skill-bar">
-                                <div class="skill-progress" data-progress="75"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="skills-category">
-                    <h3>Électronique</h3>
-                    <div class="skills-list">
-                        <div class="skill-item">
-                            <div class="skill-name">Réparation matérielle</div>
-                            <div class="skill-bar">
-                                <div class="skill-progress" data-progress="90"></div>
-                            </div>
-                        </div>
-                        <div class="skill-item">
-                            <div class="skill-name">Récupération de données</div>
-                            <div class="skill-bar">
-                                <div class="skill-progress" data-progress="85"></div>
-                            </div>
-                        </div>
-                        <div class="skill-item">
-                            <div class="skill-name">Automatisation industrielle</div>
-                            <div class="skill-bar">
-                                <div class="skill-progress" data-progress="80"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- Kaggle Achievements Section -->
-    <section id="achievements" class="achievements">
-        <div class="container">
-            <div class="section-title">
-                <h2>Kaggle Achievements</h2>
-                <div class="underline"></div>
-            </div>
-            <div class="achievements-content">
-                <div class="kaggle-profile">
-                    <div class="kaggle-header">
-                        <img src="assets/img/kaggle-logo.svg" alt="Kaggle Logo">
-                        <h3>kgrou0</h3>
-                        <span>Joined 2 years ago</span>
-                    </div>
-                    <div class="kaggle-stats">
-                        <div class="stat-item">
-                            <h4>Competitions</h4>
-                            <div class="medals">
-                                <span class="medal bronze">1</span>
-                            </div>
-                        </div>
-                        <div class="stat-item">
-                            <h4>Discussions</h4>
-                            <div class="medals">
-                                <span class="medal bronze">4</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="competitions">
-                    <h3>Competitions notables</h3>
-                    <div class="competitions-grid">
-                        <div class="competition-card">
-                            <h4>FIDE & Google Efficient Chess AI Challenge</h4>
-                            <p class="rank"><span class="highlight">120th</span> / 1,120</p>
-                            <p class="date">Mars 2025</p>
-                        </div>
-                        <div class="competition-card">
-                            <h4>AI Village Capture the Flag @ DEFCON31</h4>
-                            <p class="rank"><span class="highlight">107th</span> / 1,344</p>
-                            <p class="date">2024</p>
-                        </div>
-                        <div class="competition-card">
-                            <h4>Regression with a Mohs Hardness Dataset</h4>
-                            <p class="rank"><span class="highlight">49th</span> / 1,632</p>
-                            <p class="date">2024</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- Contact Section -->
-    <section id="contact" class="contact">
-        <div class="container">
-            <div class="section-title">
-                <h2>Contact</h2>
-                <div class="underline"></div>
-            </div>
-            <div class="contact-content">
-                <div class="contact-info">
-                    <div class="info-item">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <div>
-                            <h3>Localisation</h3>
-                            <p>Brest, Bretagne, France</p>
-                        </div>
-                    </div>
-                    <div class="info-item">
-                        <i class="fas fa-envelope"></i>
-                        <div>
-                            <h3>Email</h3>
-                            <p>elie.maby@example.com</p>
-                        </div>
-                    </div>
-                    <div class="info-item">
-                        <i class="fas fa-phone"></i>
-                        <div>
-                            <h3>Téléphone</h3>
-                            <p>+33 6 XX XX XX XX</p>
-                        </div>
-                    </div>
-                    <div class="social-links">
-                        <a href="https://www.linkedin.com/in/elie-maby-a511b51b2/" target="_blank"><i class="fab fa-linkedin"></i></a>
-                        <a href="https://www.kaggle.com/kgrou0" target="_blank"><i class="fab fa-kaggle"></i></a>
-                        <a href="https://github.com/" target="_blank"><i class="fab fa-github"></i></a>
-                    </div>
-                </div>
-                <div class="contact-form">
-                    <form id="contactForm">
-                        <div class="form-group">
-                            <input type="text" name="name" id="name" placeholder="Votre nom" required>
-                        </div>
-                        <div class="form-group">
-                            <input type="email" name="email" id="email" placeholder="Votre email" required>
-                        </div>
-                        <div class="form-group">
-                            <input type="text" name="subject" id="subject" placeholder="Sujet" required>
-                        </div>
-                        <div class="form-group">
-                            <textarea name="message" id="message" placeholder="Votre message" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Envoyer</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- Footer -->
+    <!-- Footer minimaliste -->
     <footer>
         <div class="container">
             <div class="footer-content">
@@ -494,7 +186,9 @@
                     <p>&copy; 2025 Elie Maby. Tous droits réservés.</p>
                 </div>
                 <div class="back-to-top">
-                    <a href="#home"><i class="fas fa-arrow-up"></i></a>
+                    <a href="#" id="back-to-top-btn">
+                        <i class="fas fa-chevron-up"></i>
+                    </a>
                 </div>
             </div>
         </div>
@@ -502,7 +196,7 @@
     
     <!-- Scripts -->
     <script src="js/main.js"></script>
-    <script src="js/projects.js"></script>
-    <script src="js/animations.js"></script>
+    <script src="js/particles.js"></script>
+    <script src="js/homepage.js"></script>
 </body>
 </html>
