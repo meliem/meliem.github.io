@@ -130,41 +130,22 @@ function initGsapAnimations() {
 }
 
 /**
- * Initialise l'effet parallaxe pour le header
+ * Initialise l'animation simple pour le header
  */
 function initParallaxHeader() {
-    const parallaxBg = document.querySelector('.parallax-bg');
-    if (!parallaxBg) return;
-    
-    window.addEventListener('scroll', () => {
-        const scrollPosition = window.pageYOffset;
-        // Déplacer le fond à une vitesse différente pour créer l'effet parallaxe
-        parallaxBg.style.transform = `translateY(${scrollPosition * 0.4}px)`;
-    });
-    
-    // Animation du titre du header
+    // Animation simple du titre du header
     const headerContent = document.querySelector('.header-content');
     if (headerContent) {
+        // Ajouter une animation d'entrée simple
+        headerContent.style.opacity = '0';
+        headerContent.style.transform = 'translateY(30px)';
+        
         setTimeout(() => {
-            headerContent.classList.add('animate-in');
+            headerContent.style.transition = 'opacity 1s ease, transform 1s ease';
+            headerContent.style.opacity = '1';
+            headerContent.style.transform = 'translateY(0)';
         }, 300);
     }
-    
-    // Ajouter le style pour l'animation
-    const style = document.createElement('style');
-    style.textContent = `
-        .header-content {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 1s ease, transform 1s ease;
-        }
-        
-        .header-content.animate-in {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    `;
-    document.head.appendChild(style);
 }
 
 /**
