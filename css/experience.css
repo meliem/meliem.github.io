@@ -416,232 +416,6 @@ Timeline Sections
 
 /* 
 ========================================
-Chronologie interactive
-========================================
-*/
-.interactive-chronology {
-    padding: 5rem 0;
-    background-color: var(--light-gray);
-}
-
-.chronology-container {
-    position: relative;
-    margin: 4rem 0 2rem;
-}
-
-.chronology-line {
-    position: relative;
-    height: 4px;
-    background-color: var(--medium-gray);
-    border-radius: var(--border-radius-full);
-    margin-bottom: 2rem;
-}
-
-.chronology-progress {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 0;
-    background-color: var(--primary-color);
-    border-radius: var(--border-radius-full);
-    transition: width 0.5s ease;
-}
-
-.chronology-events {
-    position: absolute;
-    top: -7px;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-}
-
-.chronology-event {
-    position: relative;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background-color: white;
-    border: 3px solid var(--medium-gray);
-    cursor: pointer;
-    transition: var(--transition-normal);
-}
-
-.chronology-event::before {
-    content: attr(data-title);
-    position: absolute;
-    top: -40px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: var(--dark-color);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: var(--border-radius-md);
-    font-size: 0.85rem;
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden;
-    transition: var(--transition-normal);
-}
-
-.chronology-event::after {
-    content: '';
-    position: absolute;
-    top: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    border-width: 5px;
-    border-style: solid;
-    border-color: var(--dark-color) transparent transparent transparent;
-    opacity: 0;
-    visibility: hidden;
-    transition: var(--transition-normal);
-}
-
-.chronology-event:hover::before,
-.chronology-event:hover::after,
-.chronology-event.active::before,
-.chronology-event.active::after {
-    opacity: 1;
-    visibility: visible;
-}
-
-.chronology-event:hover,
-.chronology-event.active {
-    border-color: var(--primary-color);
-    transform: scale(1.2);
-}
-
-.chronology-event.active {
-    background-color: var(--primary-color);
-}
-
-.chronology-years {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 1rem;
-    color: var(--text-light);
-    font-weight: 500;
-}
-
-.chronology-detail {
-    background-color: white;
-    border-radius: var(--border-radius-lg);
-    padding: 2rem;
-    margin-top: 3rem;
-    min-height: 200px;
-    box-shadow: var(--shadow-md);
-    transition: var(--transition-normal);
-}
-
-.detail-content {
-    text-align: center;
-}
-
-.detail-content.active {
-    text-align: left;
-}
-
-.detail-content h3 {
-    margin-bottom: 1rem;
-    color: var(--dark-color);
-    font-size: 1.5rem;
-}
-
-/* 
-========================================
-Compétences clés
-========================================
-*/
-.key-skills {
-    padding: 5rem 0;
-}
-
-.skills-clusters {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
-    margin-top: 3rem;
-}
-
-.skills-cluster {
-    background-color: white;
-    border-radius: var(--border-radius-lg);
-    padding: 2rem;
-    box-shadow: var(--shadow-md);
-    transition: var(--transition-normal);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-}
-
-.skills-cluster:hover {
-    transform: translateY(-10px);
-    box-shadow: var(--shadow-lg);
-}
-
-.cluster-icon {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background-color: var(--primary-color);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.5rem;
-    margin-bottom: 1.5rem;
-    transition: var(--transition-normal);
-}
-
-.skills-cluster:hover .cluster-icon {
-    transform: rotate(15deg) scale(1.1);
-    background-color: var(--accent-color);
-}
-
-.skills-cluster h3 {
-    margin-bottom: 1.5rem;
-    font-size: 1.5rem;
-    position: relative;
-    padding-bottom: 1rem;
-}
-
-.skills-cluster h3::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 30px;
-    height: 3px;
-    background-color: var(--primary-color);
-    border-radius: var(--border-radius-full);
-}
-
-.skills-cluster ul {
-    text-align: left;
-    width: 100%;
-}
-
-.skills-cluster li {
-    margin-bottom: 0.8rem;
-    position: relative;
-    padding-left: 1.5rem;
-}
-
-.skills-cluster li::before {
-    content: '\f00c';
-    font-family: 'Font Awesome 5 Free';
-    font-weight: 900;
-    position: absolute;
-    left: 0;
-    color: var(--primary-color);
-    font-size: 0.9rem;
-}
-
-/* 
-========================================
 Section CTA
 ========================================
 */
@@ -709,17 +483,6 @@ Animations
     transform: translateX(0);
 }
 
-.skills-cluster {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.8s ease, transform 0.8s ease;
-}
-
-.skills-cluster.animate-in {
-    opacity: 1;
-    transform: translateY(0);
-}
-
 /* 
 ========================================
 Responsive Design
@@ -763,12 +526,6 @@ Responsive Design
     .card-body {
         padding: 1.25rem;
     }
-    
-    .chronology-event::before {
-        white-space: normal;
-        width: 120px;
-        text-align: center;
-    }
 }
 
 @media (max-width: 768px) {
@@ -798,25 +555,6 @@ Responsive Design
         font-size: 0.9rem;
         flex: 1;
         justify-content: center;
-    }
-    
-    .chronology-container {
-        margin: 3rem 0 1.5rem;
-    }
-    
-    .chronology-event::before {
-        top: -60px;
-        font-size: 0.8rem;
-        width: 100px;
-    }
-    
-    .chronology-detail {
-        padding: 1.5rem;
-        min-height: 150px;
-    }
-    
-    .skills-clusters {
-        grid-template-columns: 1fr;
     }
     
     .cta-buttons {
@@ -861,14 +599,5 @@ Responsive Design
     .card-header .company,
     .card-header .institution {
         font-size: 1rem;
-    }
-    
-    .chronology-years {
-        font-size: 0.8rem;
-    }
-    
-    .chronology-event {
-        width: 14px;
-        height: 14px;
     }
 }

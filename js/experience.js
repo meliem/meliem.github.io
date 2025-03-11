@@ -19,9 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialiser les animations des timelines
     initTimelineAnimations();
     
-    // Initialiser la chronologie interactive
-    initInteractiveChronology();
-    
     // Initialiser les animations au scroll
     initScrollAnimations();
 });
@@ -46,22 +43,6 @@ function initGsapAnimations() {
             scrollTrigger: {
                 trigger: '.vertical-timeline',
                 start: 'top 70%',
-                toggleActions: 'play none none none'
-            }
-        });
-    }
-    
-    // Animation des clusters de compétences
-    const skillsClusters = document.querySelectorAll('.skills-cluster');
-    if (skillsClusters.length > 0) {
-        gsap.from(skillsClusters, {
-            opacity: 0,
-            y: 50,
-            stagger: 0.15,
-            duration: 0.8,
-            scrollTrigger: {
-                trigger: '.skills-clusters',
-                start: 'top 80%',
                 toggleActions: 'play none none none'
             }
         });
@@ -309,143 +290,9 @@ function initTimelineAnimations() {
 }
 
 /**
- * Initialise la chronologie interactive
- */
-function initInteractiveChronology() {
-    // Données des événements
-    const events = [
-        { year: 2020, month: 9, title: 'DUT GEII & Apprentissage ENGIE', type: 'education', description: 'Début de mon DUT GEII à l\'IUT de Brest et de mon apprentissage chez ENGIE Solutions.' },
-        { year: 2021, month: 5, title: 'Auto-entrepreneur', type: 'professional', description: 'Lancement de mon activité auto-entrepreneur dans le domaine de l\'électronique et de la récupération de données.' },
-        { year: 2022, month: 8, title: 'Diplôme DUT GEII', type: 'education', description: 'Obtention de mon DUT GEII en informatique industrielle.' },
-        { year: 2022, month: 9, title: 'Licence ESGI & Alkivi', type: 'education', description: 'Début de ma licence en informatique et réseau / cybersecurity à l\'ESGI et de mon apprentissage chez Alkivi.' },
-        { year: 2023, month: 9, title: 'Diplôme Licence', type: 'education', description: 'Obtention de ma licence en informatique et réseau / cybersecurity.' },
-        { year: 2024, month: 1, title: 'Formation IA', type: 'education', description: 'Formation intensive en intelligence artificielle chez DataScientest.com.' },
-        { year: 2024, month: 9, title: 'ISEN & Crédit Mutuel Arkéa', type: 'professional', description: 'Début de mon diplôme d\'ingénieur à l\'ISEN et de mon poste d\'Assistant Data Engineer chez Crédit Mutuel Arkéa.' }
-    ];
-    
-    // Conteneurs
-    const chronologyContainer = document.querySelector('.chronology-container');
-    const chronologyEvents = document.querySelector('.chronology-events');
-    const chronologyProgress = document.querySelector('.chronology-progress');
-    const detailContent = document.querySelector('.detail-content');
-    
-    if (!chronologyContainer || !chronologyEvents || !chronologyProgress || !detailContent) return;
-    
-    // La plage de temps totale (en mois)
-    const startDate = new Date(2020, 0, 1);
-    const endDate = new Date(2025, 11, 31);
-    const totalMonths = (endDate.getFullYear() - startDate.getFullYear()) * 12 + endDate.getMonth() - startDate.getMonth();
-    
-    // Créer les événements sur la ligne chronologique
-    events.forEach(event => {
-        // Calculer la position horizontale (en pourcentage)
-        const eventDate = new Date(event.year, event.month - 1, 1);
-        const monthsFromStart = (eventDate.getFullYear() - startDate.getFullYear()) * 12 + eventDate.getMonth() - startDate.getMonth();
-        const position = (monthsFromStart / totalMonths) * 100;
-        
-        // Créer l'élément d'événement
-        const eventElement = document.createElement('div');
-        eventElement.className = `chronology-event ${event.type}`;
-        eventElement.style.left = `${position}%`;
-        eventElement.setAttribute('data-title', event.title);
-        eventElement.setAttribute('data-description', event.description);
-        eventElement.setAttribute('data-year', event.year);
-        eventElement.setAttribute('data-month', event.month);
-        eventElement.setAttribute('data-type', event.type);
-        
-        // Ajouter au conteneur
-        chronologyEvents.appendChild(eventElement);
-        
-        // Ajouter l'événement de clic
-        eventElement.addEventListener('click', function() {
-            // Mettre à jour la classe active
-            document.querySelectorAll('.chronology-event').forEach(e => e.classList.remove('active'));
-            this.classList.add('active');
-            
-            // Mettre à jour la barre de progression
-            chronologyProgress.style.width = `${position}%`;
-            
-            // Mettre à jour le contenu du détail
-            updateDetailContent(this);
-        });
-    });
-    
-    // Fonction pour mettre à jour le contenu du détail
-    function updateDetailContent(eventElement) {
-        const title = eventElement.getAttribute('data-title');
-        const description = eventElement.getAttribute('data-description');
-        const year = eventElement.getAttribute('data-year');
-        const month = eventElement.getAttribute('data-month');
-        const type = eventElement.getAttribute('data-type');
-        
-        // Formater la date
-        const date = new Date(year, month - 1);
-        const formattedDate = date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long' });
-        
-        // Créer le contenu HTML
-        const typeIcon = type === 'education' ? 'graduation-cap' : 'briefcase';
-        const typeLabel = type === 'education' ? 'Formation' : 'Expérience professionnelle';
-        
-        const html = `
-            <h3>${title}</h3>
-            <div class="detail-meta">
-                <span class="detail-date"><i class="fas fa-calendar-alt"></i> ${formattedDate}</span>
-                <span class="detail-type"><i class="fas fa-${typeIcon}"></i> ${typeLabel}</span>
-            </div>
-            <p>${description}</p>
-        `;
-        
-        // Mettre à jour le contenu
-        detailContent.innerHTML = html;
-        detailContent.classList.add('active');
-        
-        // Animation d'entrée
-        detailContent.style.opacity = '0';
-        detailContent.style.transform = 'translateY(20px)';
-        
-        setTimeout(() => {
-            detailContent.style.opacity = '1';
-            detailContent.style.transform = 'translateY(0)';
-            detailContent.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-        }, 50);
-    }
-    
-    // Sélectionner le premier événement par défaut
-    setTimeout(() => {
-        const firstEvent = document.querySelector('.chronology-event');
-        if (firstEvent) {
-            firstEvent.click();
-        }
-    }, 500);
-}
-
-/**
  * Initialise les animations au scroll
  */
 function initScrollAnimations() {
-    // Animer les clusters de compétences
-    const skillsClusters = document.querySelectorAll('.skills-cluster');
-    
-    // Observer l'entrée dans le viewport
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry, index) => {
-            if (entry.isIntersecting) {
-                // Animer avec un délai progressif
-                setTimeout(() => {
-                    entry.target.classList.add('animate-in');
-                }, index * 150);
-                
-                // Arrêter d'observer une fois animé
-                observer.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.15 });
-    
-    // Observer chaque cluster
-    skillsClusters.forEach(cluster => {
-        observer.observe(cluster);
-    });
-    
     // Animation au scroll pour les sections
     window.addEventListener('scroll', () => {
         // Effet parallaxe pour l'en-tête
@@ -467,23 +314,4 @@ function initScrollAnimations() {
             }
         }
     });
-    
-    // Animation pour les détails de chronologie
-    const chronologyDetail = document.querySelector('.chronology-detail');
-    if (chronologyDetail) {
-        const detailObserver = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting) {
-                chronologyDetail.style.transform = 'translateY(0)';
-                chronologyDetail.style.opacity = '1';
-                chronologyDetail.style.transition = 'transform 0.8s ease, opacity 0.8s ease';
-                detailObserver.unobserve(chronologyDetail);
-            }
-        }, { threshold: 0.5 });
-        
-        // Préparer l'animation
-        chronologyDetail.style.transform = 'translateY(30px)';
-        chronologyDetail.style.opacity = '0';
-        
-        detailObserver.observe(chronologyDetail);
-    }
 }
