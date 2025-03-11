@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parcours | Elie Maby</title>
+    <meta name="description" content="Découvrez le parcours professionnel et académique d'Elie Maby - Data Engineer, électronicien et développeur">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="assets/img/favicon.ico">
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/experience.css">
+    
+    <!-- Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- GSAP pour les animations avancées -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+</head>
+<body class="page-experience">
+    <!-- Overlay de transition entre les pages -->
+    <div class="page-transition-overlay"></div>
+    
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="container">
+            <div class="logo">
+                <a href="index.html">EM</a>
+            </div>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="about.html">À propos</a></li>
+                <li><a href="experience.html" class="active">Parcours</a></li>
+                <li><a href="projects.html">Projets</a></li>
+                <li><a href="skills.html">Compétences</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <!-- Header avec effet 3D parallaxe -->
+    <header class="page-header experience-header">
+        <div class="header-layers">
+            <div class="header-layer" data-depth="0.1">
+                <div class="layer-content layer-bg"></div>
+            </div>
+            <div class="header-layer" data-depth="0.2">
+                <div class="layer-content layer-grid"></div>
+            </div>
+            <div class="header-layer" data-depth="0.3">
+                <div class="layer-content layer-particles"></div>
+            </div>
+            <div class="header-layer" data-depth="0.1">
+                <div class="layer-content layer-overlay"></div>
+            </div>
+        </div>
+        <div class="header-content">
+            <h1 class="animate-text">Mon Parcours</h1>
+            <p class="header-subtitle">Expérience professionnelle et formation</p>
+        </div>
+    </header>
+    
+    <!-- Tabs de navigation -->
+    <section class="experience-tabs">
+        <div class="container">
+            <div class="tabs-container">
+                <button class="tab-btn active" data-tab="professional">
+                    <i class="fas fa-briefcase"></i>
+                    <span>Expérience Professionnelle</span>
+                </button>
+                <button class="tab-btn" data-tab="education">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Formation</span>
+                </button>
+                <div class="tab-indicator"></div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Timeline Section - Expérience Professionnelle -->
+    <section class="timeline-section active" id="professional-timeline">
+        <div class="container">
+            <div class="section-intro">
+                <h2>Expérience Professionnelle</h2>
+                <p>Mon parcours professionnel m'a permis d'acquérir une expertise variée en data engineering, développement logiciel et électronique.</p>
+            </div>
+            
+            <div class="vertical-timeline">
+                <!-- Timeline item 1 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">
+                        <span class="year">2024</span>
+                        <span class="month">Sept</span>
+                        <span class="duration">Présent</span>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="content-card">
+                            <div class="card-header">
+                                <h3>Assistant Data Engineer</h3>
+                                <span class="company">Crédit Mutuel Arkéa</span>
+                                <span class="job-type">Apprentissage</span>
+                            </div>
+                            <div class="card-body">
+                                <p>Développement et maintenance d'infrastructures de données pour le groupe bancaire.</p>
+                                <ul class="responsibilities">
+                                    <li>Conception de pipelines ETL pour l'intégration de données</li>
+                                    <li>Optimisation des requêtes et performances des bases de données</li>
+                                    <li>Mise en place de systèmes de monitoring et d'alerte</li>
+                                    <li>Collaboration avec les équipes data science pour le déploiement de modèles</li>
+                                </ul>
+                                <div class="tech-stack">
+                                    <span>Python</span>
+                                    <span>SQL</span>
+                                    <span>Kafka</span>
+                                    <span>Spark</span>
+                                    <span>AWS</span>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <span class="location"><i class="fas fa-map-marker-alt"></i> Brest, Bretagne</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Timeline item 2 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">
+                        <span class="year">2021</span>
+                        <span class="month">Mai</span>
+                        <span class="duration">Présent</span>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="content-card">
+                            <div class="card-header">
+                                <h3>Auto-entrepreneur en Électronique</h3>
+                                <span class="company">Indépendant</span>
+                                <span class="job-type featured">Auto-entrepreneur</span>
+                            </div>
+                            <div class="card-body">
+                                <p>Création et gestion d'une activité indépendante spécialisée dans la réparation électronique et la récupération de données.</p>
+                                <ul class="responsibilities">
+                                    <li>Réparation d'appareils électroniques variés (ordinateurs, smartphones, consoles)</li>
+                                    <li>Récupération de données sur supports endommagés</li>
+                                    <li>Développement d'outils de diagnostic personnalisés</li>
+                                    <li>Service client et suivi de projets</li>
+                                </ul>
+                                <div class="tech-stack">
+                                    <span>Hardware</span>
+                                    <span>Diagnostic</span>
+                                    <span>Réparation</span>
+                                    <span>Python</span>
+                                    <span>Récupération de données</span>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <span class="location"><i class="fas fa-map-marker-alt"></i> Hybride</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Timeline item 3 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">
+                        <span class="year">2022</span>
+                        <span class="month">Sept</span>
+                        <span class="duration">1 an</span>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="content-card">
+                            <div class="card-header">
+                                <h3>Chef de projet logiciel et réseau</h3>
+                                <span class="company">Alkivi</span>
+                                <span class="job-type">Apprentissage</span>
+                            </div>
+                            <div class="card-body">
+                                <p>Gestion de projets informatiques et administration de solutions cloud pour les clients de l'entreprise.</p>
+                                <ul class="responsibilities">
+                                    <li>Administration Microsoft Azure et Office 365</li>
+                                    <li>Configuration et déploiement de solutions Apple Business Manager</li>
+                                    <li>Gestion de parc informatique et support technique</li>
+                                    <li>Coordination d'équipes techniques pour les déploiements clients</li>
+                                </ul>
+                                <div class="tech-stack">
+                                    <span>Microsoft Azure</span>
+                                    <span>Office 365</span>
+                                    <span>Apple Business Manager</span>
+                                    <span>PowerShell</span>
+                                    <span>Réseau</span>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <span class="location"><i class="fas fa-map-marker-alt"></i> Lille, Hauts-de-France</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Timeline item 4 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">
+                        <span class="year">2020</span>
+                        <span class="month">Sept</span>
+                        <span class="duration">2 ans</span>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="content-card">
+                            <div class="card-header">
+                                <h3>Apprenti GEII</h3>
+                                <span class="company">ENGIE Solutions France</span>
+                                <span class="job-type">Apprentissage</span>
+                            </div>
+                            <div class="card-body">
+                                <p>Apprentissage en Génie Électrique et Informatique Industrielle au sein de différents sites clients.</p>
+                                <ul class="responsibilities">
+                                    <li>Missions diversifiées (Ifremer Plouzanné, CIN Brest, Pyrotechnie Brest, etc.)</li>
+                                    <li>Développement d'une GTC provisoire pour l'Institut Polaire Français</li>
+                                    <li>Maintenance et installation d'équipements électroniques</li>
+                                    <li>Programmation de systèmes automatisés</li>
+                                </ul>
+                                <div class="tech-stack">
+                                    <span>Électronique</span>
+                                    <span>Automatisation</span>
+                                    <span>GTC</span>
+                                    <span>PLC</span>
+                                    <span>SCADA</span>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <span class="location"><i class="fas fa-map-marker-alt"></i> Brest, Bretagne</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Timeline Section - Formation -->
+    <section class="timeline-section" id="education-timeline">
+        <div class="container">
+            <div class="section-intro">
+                <h2>Formation</h2>
+                <p>Mon parcours académique m'a permis d'acquérir des compétences solides en informatique, électronique et data science.</p>
+            </div>
+            
+            <div class="vertical-timeline">
+                <!-- Education item 1 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">
+                        <span class="year">2024</span>
+                        <span class="month">Sept</span>
+                        <span class="duration">En cours</span>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="content-card">
+                            <div class="card-header">
+                                <h3>Diplôme d'ingénieur en Informatique</h3>
+                                <span class="institution">Institut supérieur d'électronique et du numérique (ISEN)</span>
+                            </div>
+                            <div class="card-body">
+                                <p>Formation d'ingénieur en informatique avec spécialisation en Data Engineering et Systèmes Intelligents.</p>
+                                <ul class="curriculum">
+                                    <li>Architectures Big Data et Cloud Computing</li>
+                                    <li>Intelligence artificielle avancée</li>
+                                    <li>Sécurité des systèmes d'information</li>
+                                    <li>Management de projets informatiques</li>
+                                </ul>
+                            </div>
+                            <div class="card-footer">
+                                <span class="location"><i class="fas fa-map-marker-alt"></i> Brest, Bretagne</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Education item 2 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">
+                        <span class="year">2024</span>
+                        <span class="month">Jan</span>
+                        <span class="duration">5 mois</span>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="content-card">
+                            <div class="card-header">
+                                <h3>Chef de projet en intelligence artificielle</h3>
+                                <span class="institution">DataScientest.com</span>
+                            </div>
+                            <div class="card-body">
+                                <p>Formation intensive en data science et intelligence artificielle.</p>
+                                <ul class="curriculum">
+                                    <li>Apprentissage automatique et deep learning</li>
+                                    <li>Traitement et analyse de données à grande échelle</li>
+                                    <li>Déploiement de modèles d'IA en production</li>
+                                    <li>Gestion de projets data-driven</li>
+                                </ul>
+                                <div class="tech-stack">
+                                    <span>Python</span>
+                                    <span>Machine Learning</span>
+                                    <span>Deep Learning</span>
+                                    <span>Linux</span>
+                                    <span>Data Engineering</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Education item 3 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">
+                        <span class="year">2022</span>
+                        <span class="month">Sept</span>
+                        <span class="duration">1 an</span>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="content-card">
+                            <div class="card-header">
+                                <h3>Licence en informatique et réseau / cybersecurity</h3>
+                                <span class="institution">ESGI</span>
+                            </div>
+                            <div class="card-body">
+                                <p>Formation spécialisée en informatique, réseaux et cybersécurité.</p>
+                                <ul class="curriculum">
+                                    <li>Développement d'applications sécurisées</li>
+                                    <li>Architecture et sécurité des réseaux</li>
+                                    <li>Cryptographie et protection des données</li>
+                                    <li>Projet: développement d'un IDS avec détection par réseau neuronal</li>
+                                </ul>
+                                <div class="tech-stack">
+                                    <span>C++</span>
+                                    <span>Python</span>
+                                    <span>Linux</span>
+                                    <span>C</span>
+                                    <span>Cybersécurité</span>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <span class="location"><i class="fas fa-map-marker-alt"></i> Paris</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Education item 4 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">
+                        <span class="year">2020</span>
+                        <span class="month">Sept</span>
+                        <span class="duration">2 ans</span>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="content-card">
+                            <div class="card-header">
+                                <h3>DUT GEII, Informatique industrielle</h3>
+                                <span class="institution">IUT Brest Morlaix</span>
+                            </div>
+                            <div class="card-body">
+                                <p>Formation en Génie Électrique et Informatique Industrielle.</p>
+                                <ul class="curriculum">
+                                    <li>Électronique analogique et numérique</li>
+                                    <li>Automatique et automatismes industriels</li>
+                                    <li>Programmation embarquée</li>
+                                    <li>Réseaux industriels et supervision</li>
+                                </ul>
+                                <div class="tech-stack">
+                                    <span>Électronique</span>
+                                    <span>Automatisation industrielle</span>
+                                    <span>C</span>
+                                    <span>PLC</span>
+                                    <span>Microcontrôleurs</span>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <span class="location"><i class="fas fa-map-marker-alt"></i> Brest, Bretagne</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Section de chronologie interactive -->
+    <section class="interactive-chronology">
+        <div class="container">
+            <div class="section-title">
+                <h2>Ma chronologie</h2>
+                <div class="underline"></div>
+                <p>Parcourez ma carrière et ma formation sur une ligne de temps interactive</p>
+            </div>
+            
+            <div class="chronology-container">
+                <div class="chronology-line">
+                    <div class="chronology-progress"></div>
+                </div>
+                
+                <div class="chronology-events">
+                    <!-- Les événements seront générés par JavaScript -->
+                </div>
+                
+                <div class="chronology-years">
+                    <span>2020</span>
+                    <span>2021</span>
+                    <span>2022</span>
+                    <span>2023</span>
+                    <span>2024</span>
+                    <span>2025</span>
+                </div>
+            </div>
+            
+            <div class="chronology-detail">
+                <div class="detail-content">
+                    <h3>Sélectionnez un événement</h3>
+                    <p>Cliquez sur un événement de la chronologie pour afficher les détails</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Section de compétences clés -->
+    <section class="key-skills">
+        <div class="container">
+            <div class="section-title">
+                <h2>Compétences clés acquises</h2>
+                <div class="underline"></div>
+                <p>Les compétences essentielles développées au cours de mon parcours</p>
+            </div>
+            
+            <div class="skills-clusters">
+                <div class="skills-cluster">
+                    <div class="cluster-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <h3>Data Engineering</h3>
+                    <ul>
+                        <li>Conception de pipelines ETL</li>
+                        <li>Architecture de données massives</li>
+                        <li>SQL / NoSQL</li>
+                        <li>Stockage distribué</li>
+                    </ul>
+                </div>
+                
+                <div class="skills-cluster">
+                    <div class="cluster-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3>Développement</h3>
+                    <ul>
+                        <li>Python / C++ / Swift</li>
+                        <li>Développement web</li>
+                        <li>Conception logicielle</li>
+                        <li>Git & CI/CD</li>
+                    </ul>
+                </div>
+                
+                <div class="skills-cluster">
+                    <div class="cluster-icon">
+                        <i class="fas fa-microchip"></i>
+                    </div>
+                    <h3>Électronique</h3>
+                    <ul>
+                        <li>Diagnostic matériel</li>
+                        <li>Réparation avancée</li>
+                        <li>Conception de circuits</li>
+                        <li>Systèmes embarqués</li>
+                    </ul>
+                </div>
+                
+                <div class="skills-cluster">
+                    <div class="cluster-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Cybersécurité</h3>
+                    <ul>
+                        <li>Détection d'intrusion</li>
+                        <li>Sécurité réseau</li>
+                        <li>Forensique</li>
+                        <li>Hardening de systèmes</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Section CTA -->
+    <section class="experience-cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Intéressé par mon profil?</h2>
+                <p>Découvrez mes projets concrets ou contactez-moi directement pour discuter d'opportunités.</p>
+                <div class="cta-buttons">
+                    <a href="projects.html" class="btn btn-secondary">
+                        <span class="btn-text">Voir mes projets</span>
+                        <span class="btn-icon"><i class="fas fa-project-diagram"></i></span>
+                    </a>
+                    <a href="contact.html" class="btn btn-primary">
+                        <span class="btn-text">Me contacter</span>
+                        <span class="btn-icon"><i class="fas fa-envelope"></i></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="copyright">
+                    <p>&copy; 2025 Elie Maby. Tous droits réservés.</p>
+                </div>
+                <div class="back-to-top">
+                    <a href="#" id="back-to-top-btn">
+                        <i class="fas fa-chevron-up"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Scripts -->
+    <script src="js/main.js"></script>
+    <script src="js/experience.js"></script>
+</body>
+</html>
