@@ -6,14 +6,14 @@ Styles spécifiques pour la page À propos
 
 /* En-tête simplifié */
 .page-header {
-    height: 40vh;
-    min-height: 300px;
+    height: 30vh;
+    min-height: 200px;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
     overflow: hidden;
-    margin-bottom: 2rem;
+    margin-bottom: 0; /* Suppression de la marge inférieure */
 }
 
 .header-bg {
@@ -209,17 +209,17 @@ Sections de contenu
 .about-content {
     display: flex;
     flex-direction: column;
-    gap: 3rem;
+    gap: 2rem; /* Réduction de l'écart entre les sections */
 }
 
 .content-section {
-    margin-bottom: 2rem;
+    margin-bottom: 1rem; /* Réduction de la marge inférieure */
 }
 
 .section-heading {
     position: relative;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.75rem;
+    margin-bottom: 1rem; /* Réduction de la marge */
+    padding-bottom: 0.5rem;
 }
 
 .section-heading::after {
