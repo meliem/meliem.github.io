@@ -13,7 +13,7 @@ Styles spécifiques pour la page À propos
     justify-content: center;
     position: relative;
     overflow: hidden;
-    margin-bottom: 0; /* Suppression de la marge inférieure */
+    margin-bottom: 0; /* Suppression de la marge */
 }
 
 .header-bg {
@@ -209,17 +209,17 @@ Sections de contenu
 .about-content {
     display: flex;
     flex-direction: column;
-    gap: 2rem; /* Réduction de l'écart entre les sections */
+    gap: 3rem;
 }
 
 .content-section {
-    margin-bottom: 1rem; /* Réduction de la marge inférieure */
+    margin-bottom: 2rem;
 }
 
 .section-heading {
     position: relative;
-    margin-bottom: 1rem; /* Réduction de la marge */
-    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
 }
 
 .section-heading::after {
