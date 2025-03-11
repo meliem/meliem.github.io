@@ -70,6 +70,12 @@ function addAnimationClasses() {
 function initScrollAnimations() {
     const animatedElements = document.querySelectorAll('.fade-in, .fade-in-left, .fade-in-right, .scale-in');
     
+    // Ajouter immédiatement la classe 'appear' à tous les éléments pour s'assurer qu'ils sont visibles
+    animatedElements.forEach(element => {
+        element.classList.add('appear');
+    });
+    
+    // Continuer avec l'animation au scroll pour les nouveaux éléments
     const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {

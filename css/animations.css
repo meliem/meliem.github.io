@@ -3,46 +3,51 @@
 Animation classes
 ========================================
 */
-.fade-in {
-    opacity: 0;
-    transform: translateY(30px);
+/* État par défaut - visible, mais prêt pour l'animation */
+.fade-in, .fade-in-left, .fade-in-right, .scale-in {
+    opacity: 1; /* Visible par défaut */
     transition: opacity 0.8s ease, transform 0.8s ease;
+    will-change: transform, opacity;
 }
 
-.fade-in.appear {
+/* État initial uniquement si JavaScript est activé */
+.js-enabled .fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+.js-enabled .fade-in-left {
+    opacity: 0;
+    transform: translateX(-50px);
+}
+
+.js-enabled .fade-in-right {
+    opacity: 0;
+    transform: translateX(50px);
+}
+
+.js-enabled .scale-in {
+    opacity: 0;
+    transform: scale(0.8);
+}
+
+/* État final après animation */
+.fade-in.appear, .js-enabled .fade-in.appear {
     opacity: 1;
     transform: translateY(0);
 }
 
-.fade-in-left {
-    opacity: 0;
-    transform: translateX(-50px);
-    transition: opacity 0.8s ease, transform 0.8s ease;
-}
-
-.fade-in-left.appear {
+.fade-in-left.appear, .js-enabled .fade-in-left.appear {
     opacity: 1;
     transform: translateX(0);
 }
 
-.fade-in-right {
-    opacity: 0;
-    transform: translateX(50px);
-    transition: opacity 0.8s ease, transform 0.8s ease;
-}
-
-.fade-in-right.appear {
+.fade-in-right.appear, .js-enabled .fade-in-right.appear {
     opacity: 1;
     transform: translateX(0);
 }
 
-.scale-in {
-    opacity: 0;
-    transform: scale(0.8);
-    transition: opacity 0.8s ease, transform 0.8s ease;
-}
-
-.scale-in.appear {
+.scale-in.appear, .js-enabled .scale-in.appear {
     opacity: 1;
     transform: scale(1);
 }

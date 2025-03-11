@@ -10,12 +10,35 @@
     <link rel="icon" href="assets/img/favicon.ico">
     
     <!-- CSS Files -->
-    <link rel="stylesheet" href="./css/style.css">
-    <link rel="stylesheet" href="./css/animations.css">
-    <link rel="stylesheet" href="./css/responsive.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/responsive.css">
     
     <!-- Font Awesome pour les icônes -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Solution de secours pour assurer la visibilité du contenu -->
+    <style>
+        /* Ces styles s'assurent que le contenu reste visible même si JavaScript ne charge pas correctement */
+        body, section, .container, .hero-content, .about-content, 
+        .timeline, .projects-grid, .skills-content, 
+        .achievements-content, .contact-content {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+        
+        /* Désactiver les transformations initiales qui pourraient cacher le contenu */
+        .fade-in, .fade-in-left, .fade-in-right, .scale-in {
+            transform: none !important;
+            opacity: 1 !important;
+        }
+        
+        /* Ces styles seront écrasés par JavaScript si tout fonctionne bien */
+        .js-enabled .fade-in, .js-enabled .fade-in-left, 
+        .js-enabled .fade-in-right, .js-enabled .scale-in {
+            /* JavaScript réappliquera les animations */
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation -->
@@ -478,8 +501,8 @@
     </footer>
     
     <!-- Scripts -->
-    <script src="./js/main.js"></script>
-    <script src="./js/projects.js"></script>
-    <script src="./js/animations.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/projects.js"></script>
+    <script src="js/animations.js"></script>
 </body>
 </html>

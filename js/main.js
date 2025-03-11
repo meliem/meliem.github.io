@@ -1,10 +1,28 @@
 // Attendre que le DOM soit complètement chargé
 document.addEventListener('DOMContentLoaded', function() {
+    // Ajouter une classe au body pour indiquer que JavaScript est activé
+    document.body.classList.add('js-enabled');
+    
+    // Solution de secours : s'assurer que tout le contenu est visible après 2 secondes
+    // même si les animations ne se déclenchent pas correctement
+    setTimeout(function() {
+        document.querySelectorAll('.fade-in, .fade-in-left, .fade-in-right, .scale-in').forEach(el => {
+            el.classList.add('appear');
+            el.style.opacity = '1';
+            el.style.transform = 'none';
+        });
+    }, 2000);
+    
     // Afficher la page après le chargement complet
     window.addEventListener('load', function() {
         document.body.classList.add('loaded');
         // Initialiser les animations
         initAnimations();
+        
+        // Forcer l'affichage de tous les éléments après le chargement
+        document.querySelectorAll('section').forEach(section => {
+            section.style.opacity = '1';
+        });
     });
 
     // Initialiser la navigation

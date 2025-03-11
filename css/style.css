@@ -3,6 +3,19 @@
 Variables et reset
 ========================================
 */
+
+/* Correction pour assurer que tout le contenu est visible */
+section, .section-title, .hero-content, .about-content, 
+.timeline, .projects-grid, .skills-content, 
+.achievements-content, .contact-content {
+    opacity: 1 !important; /* Forcer la visibilité */
+}
+
+/* Si des animations sont activées, elles peuvent être gérées uniquement par JavaScript */
+.js-enabled section[id] {
+    transition: opacity 0.3s ease;
+}
+
 :root {
     --primary-color: #2563eb;
     --secondary-color: #1e40af;
