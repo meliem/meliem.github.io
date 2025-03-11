@@ -14,6 +14,7 @@ Styles spécifiques pour la page À propos
     position: relative;
     overflow: hidden;
     margin-bottom: 0; /* Suppression de la marge */
+    padding-top: 80px; /* Ajout d'un padding pour éviter la superposition avec le menu */
 }
 
 .header-bg {
