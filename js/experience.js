@@ -379,241 +379,136 @@ function initParallaxHeader() {
 }
 
 /**
- * Initialise les onglets de navigation - PARTIE CORRIGÉE
+ * Initialise les onglets de navigation - CORRECTION DÉFINITIVE
  */
 function initTabs() {
     const tabButtons = document.querySelectorAll('.tab-btn');
-    const tabSections = document.querySelectorAll('.timeline-section');
+    const professionalTimeline = document.getElementById('professional-timeline');
+    const educationTimeline = document.getElementById('education-timeline');
     const tabIndicator = document.querySelector('.tab-indicator');
     
-    if (tabButtons.length === 0 || tabSections.length === 0 || !tabIndicator) return;
+    if (tabButtons.length === 0 || !professionalTimeline || !educationTimeline) return;
     
-    // Fonction pour mettre à jour l'indicateur avec animation fluide
-    function updateIndicator(activeTab) {
-        // Obtenir les dimensions et la position du bouton actif
-        const tabRect = activeTab.getBoundingClientRect();
-        const containerRect = activeTab.parentNode.getBoundingClientRect();
-        
-        // Calculer la position relative
-        const leftPosition = tabRect.left - containerRect.left;
-        
-        // Ajouter une transition fluide
-        tabIndicator.style.transition = 'width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
-        
-        // Mettre à jour l'indicateur avec un petit délai pour l'animation
-        requestAnimationFrame(() => {
-            tabIndicator.style.width = tabRect.width + 'px';
-            tabIndicator.style.transform = `translateX(${leftPosition}px)`;
-        });
-    }
-    
-    // CORRECTION: Initialiser la section active au chargement
-    const activeTab = document.querySelector('.tab-btn.active');
-    
-    if (activeTab) {
-        // Mettre à jour l'indicateur
-        updateIndicator(activeTab);
-        
-        // Afficher la section correspondante
-        const targetTab = activeTab.getAttribute('data-tab');
-        
-        // S'assurer que la bonne section est visible
-        tabSections.forEach(section => {
-            section.classList.remove('active');
-            if (section.id === targetTab + '-timeline') {
-                section.classList.add('active');
-                // Animer la section initiale avec un petit délai pour permettre le rendu
-                setTimeout(() => {
-                    animateNewSection(targetTab + '-timeline');
-                }, 100);
-            }
-        });
-    } else {
-        // CORRECTION: Si aucun onglet n'est actif, activer le premier par défaut (expérience professionnelle)
-        if (tabButtons.length > 0) {
-            const defaultTab = tabButtons[0];
-            defaultTab.classList.add('active');
-            updateIndicator(defaultTab);
-            
-            const targetTab = defaultTab.getAttribute('data-tab');
-            
-            // Activer la section correspondante
-            tabSections.forEach(section => {
-                section.classList.remove('active');
-                if (section.id === targetTab + '-timeline') {
-                    section.classList.add('active');
-                    // Animer la section initiale
-                    setTimeout(() => {
-                        animateNewSection(targetTab + '-timeline');
-                    }, 100);
-                }
-            });
-        }
-    }
-    
-    // Gérer les clics sur les onglets avec une animation améliorée
-    tabButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            // Si déjà actif, ne rien faire
-            if (this.classList.contains('active')) return;
-            
-            // Effet de ripple au clic
-            createRippleEffect(this);
-            
-            // Mettre à jour les classes actives
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            this.classList.add('active');
-            
-            // Mettre à jour l'indicateur
-            updateIndicator(this);
-            
-            // Afficher la section correspondante avec transition
-            const targetTab = this.getAttribute('data-tab');
-            
-            // Trouver la section actuellement active
-            const activeSection = document.querySelector('.timeline-section.active');
-            const newSection = document.getElementById(targetTab + '-timeline');
-            
-            if (activeSection && newSection) {
-                // Animer la sortie de la section active
-                fadeOutSection(activeSection, () => {
-                    // Masquer toutes les sections
-                    tabSections.forEach(section => {
-                        section.classList.remove('active');
-                    });
-                    
-                    // Afficher et animer la nouvelle section
-                    newSection.classList.add('active');
-                    fadeInSection(newSection);
-                    animateNewSection(targetTab + '-timeline');
-                });
-            } else {
-                // Fallback si les animations ne fonctionnent pas
-                tabSections.forEach(section => {
-                    section.classList.remove('active');
-                    if (section.id === targetTab + '-timeline') {
-                        section.classList.add('active');
-                    }
-                });
-                
-                // Animation d'entrée pour la nouvelle section
-                animateNewSection(targetTab + '-timeline');
-            }
-        });
-    });
-    
-    // Gérer le redimensionnement avec debounce pour la performance
-    let resizeTimeout;
-    window.addEventListener('resize', () => {
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(() => {
-            const activeTab = document.querySelector('.tab-btn.active');
-            if (activeTab) {
-                updateIndicator(activeTab);
-            }
-        }, 250);
-    });
-    
-    // Fonction pour animer l'entrée de la nouvelle section
-    function animateNewSection(sectionId) {
-        const section = document.getElementById(sectionId);
-        if (!section) return;
-        
-        // Animer les éléments de la timeline avec une animation plus fluide
-        const timelineItems = section.querySelectorAll('.timeline-item');
-        
-        // Réinitialiser tous les éléments
-        timelineItems.forEach(item => {
-            item.style.opacity = '0';
-            item.style.transform = 'translateX(-50px)';
-            item.style.transition = 'none';
-        });
-        
-        // Forcer le reflow pour appliquer les styles initiaux
-        section.offsetHeight;
-        
-        // Appliquer les transitions
-        timelineItems.forEach(item => {
-            item.style.transition = 'opacity 0.6s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1)';
-        });
-        
-        // Animer avec un délai progressif raffiné
-        timelineItems.forEach((item, index) => {
-            setTimeout(() => {
-                item.style.opacity = '1';
-                item.style.transform = 'translateX(0)';
-            }, 50 + (index * 80)); // Délai progressif pour un effet cascade
-        });
-    }
-    
-    // Animation de fondu pour la sortie des sections
-    function fadeOutSection(section, callback) {
-        section.style.opacity = '1';
-        section.style.transition = 'opacity 0.3s ease';
-        
-        requestAnimationFrame(() => {
-            section.style.opacity = '0';
-            
-            setTimeout(() => {
-                if (callback) callback();
-            }, 300);
-        });
-    }
-    
-    // Animation de fondu pour l'entrée des sections
-    function fadeInSection(section) {
-        section.style.opacity = '0';
-        section.style.transition = 'opacity 0.4s ease';
-        
-        requestAnimationFrame(() => {
-            section.style.opacity = '1';
-        });
-    }
-    
-    // Effet de ripple pour les boutons
-    function createRippleEffect(button) {
-        const ripple = document.createElement('span');
-        ripple.classList.add('tab-ripple');
-        
-        const rect = button.getBoundingClientRect();
-        
-        ripple.style.width = ripple.style.height = Math.max(rect.width, rect.height) + 'px';
-        ripple.style.left = '50%';
-        ripple.style.top = '50%';
-        ripple.style.transform = 'translate(-50%, -50%) scale(0)';
-        
-        button.appendChild(ripple);
-        
-        // Animer le ripple
-        requestAnimationFrame(() => {
-            ripple.style.transform = 'translate(-50%, -50%) scale(1)';
-            ripple.style.opacity = '0';
-            
-            // Nettoyer après l'animation
-            setTimeout(() => {
-                ripple.remove();
-            }, 600);
-        });
-    }
-    
-    // Ajouter les styles pour l'effet ripple
+    // CORRECTION IMPORTANTE: Supprimer les transitions temporairement
+    // pour éviter les problèmes de fondu au chargement initial
     const style = document.createElement('style');
     style.textContent = `
-        .tab-btn {
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .tab-ripple {
-            position: absolute;
-            background-color: rgba(255, 255, 255, 0.4);
-            border-radius: 50%;
-            pointer-events: none;
-            opacity: 1;
-            transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s ease;
+        .timeline-section {
+            transition: none !important;
         }
     `;
     document.head.appendChild(style);
+    
+    // Fonction pour activer un onglet et sa section
+    function activateTab(tab) {
+        // 1. Mettre à jour les boutons
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tab.classList.add('active');
+        
+        // 2. Mettre à jour l'indicateur
+        if (tabIndicator) {
+            const tabRect = tab.getBoundingClientRect();
+            const containerRect = tab.parentNode.getBoundingClientRect();
+            const leftPosition = tabRect.left - containerRect.left;
+            
+            tabIndicator.style.width = tabRect.width + 'px';
+            tabIndicator.style.left = leftPosition + 'px';
+        }
+        
+        // 3. Afficher la section correspondante
+        const targetTab = tab.getAttribute('data-tab');
+        
+        // Masquer toutes les sections d'abord
+        professionalTimeline.style.display = 'none';
+        professionalTimeline.classList.remove('active');
+        educationTimeline.style.display = 'none';
+        educationTimeline.classList.remove('active');
+        
+        // Afficher uniquement la section active
+        if (targetTab === 'professional') {
+            professionalTimeline.style.display = 'block';
+            professionalTimeline.classList.add('active');
+            // Force l'opacité à 1 pour éviter les problèmes de fondu
+            professionalTimeline.style.opacity = '1';
+        } else if (targetTab === 'education') {
+            educationTimeline.style.display = 'block';
+            educationTimeline.classList.add('active');
+            // Force l'opacité à 1 pour éviter les problèmes de fondu
+            educationTimeline.style.opacity = '1';
+        }
+    }
+    
+    // INITIALISATION AU CHARGEMENT
+    // Vérifier s'il y a un onglet actif
+    const activeTab = document.querySelector('.tab-btn.active');
+    
+    if (activeTab) {
+        // Utiliser l'onglet déjà actif dans le HTML
+        activateTab(activeTab);
+    } else if (tabButtons.length > 0) {
+        // Sinon, activer le premier onglet par défaut (expérience professionnelle)
+        activateTab(tabButtons[0]);
+    }
+    
+    // Une fois l'affichage initial terminé, restaurer les transitions
+    // pour les changements d'onglets futurs
+    setTimeout(() => {
+        style.textContent = `
+            .timeline-section {
+                transition: opacity 0.3s ease, transform 0.3s ease;
+            }
+            
+            .timeline-section:not(.active) {
+                opacity: 0;
+                transform: translateY(20px);
+                pointer-events: none;
+            }
+            
+            .timeline-section.active {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        `;
+        
+        // Animer les éléments de la timeline active
+        const activeSection = document.querySelector('.timeline-section.active');
+        if (activeSection) {
+            animateTimelineItems(activeSection);
+        }
+    }, 200);
+    
+    // Gérer les clics sur les onglets
+    tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Activer l'onglet cliqué
+            activateTab(this);
+            
+            // Animer les éléments de la timeline
+            const targetTab = this.getAttribute('data-tab');
+            const targetSection = document.getElementById(targetTab + '-timeline');
+            if (targetSection) {
+                animateTimelineItems(targetSection);
+            }
+        });
+    });
+    
+    // Animation des éléments de la timeline
+    function animateTimelineItems(section) {
+        const timelineItems = section.querySelectorAll('.timeline-item');
+        
+        timelineItems.forEach((item, index) => {
+            // Réinitialiser le style pour l'animation
+            item.style.opacity = '0';
+            item.style.transform = 'translateX(-30px)';
+            
+            // Animer avec délai
+            setTimeout(() => {
+                item.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                item.style.opacity = '1';
+                item.style.transform = 'translateX(0)';
+            }, 100 + (index * 80));
+        });
+    }
 }
 
 /**
@@ -817,15 +712,6 @@ function initScrollAnimations() {
                 transform: translateY(0);
             }
         }
-        
-        .timeline-section {
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-        
-        .timeline-section.active {
-            opacity: 1;
-        }
     `;
     document.head.appendChild(style);
 }
@@ -944,22 +830,6 @@ function initTimelineInteractivity() {
         .timeline-dot:hover {
             transform: scale(1.3);
             background-color: var(--primary-color);
-        }
-        
-        /* Animation lors du changement d'onglet */
-        .timeline-section {
-            transition: opacity 0.4s ease, transform 0.4s ease;
-        }
-        
-        .timeline-section:not(.active) {
-            opacity: 0;
-            transform: translateY(20px);
-            pointer-events: none;
-        }
-        
-        .timeline-section.active {
-            opacity: 1;
-            transform: translateY(0);
         }
     `;
     document.head.appendChild(style);
