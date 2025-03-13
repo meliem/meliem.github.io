@@ -7,41 +7,78 @@
  * - Effets généraux
  */
 
-// Variables globales
-let isPageTransitioning = false;
-const transitionDuration = 700; // En millisecondes, doit correspondre à la durée CSS
+// Gestionnaire d'état global pour améliorer la maintenabilité et éviter les variables globales éparpillées
+const AppState = {
+    isPageTransitioning: false,
+    transitionDuration: 700, // En millisecondes, doit correspondre à la durée CSS
+    isPageLoaded: false,
+    eventListeners: [], // Stocke les références aux event listeners pour le nettoyage
+    
+    // Méthode pour ajouter des écouteurs d'événements de manière centralisée
+    addEventListeners: function(element, eventType, callback, options) {
+        if (!element) return;
+        
+        element.addEventListener(eventType, callback, options);
+        this.eventListeners.push({ element, eventType, callback });
+    },
+    
+    // Méthode pour nettoyer tous les écouteurs avant une navigation
+    removeAllEventListeners: function() {
+        this.eventListeners.forEach(({ element, eventType, callback }) => {
+            element.removeEventListener(eventType, callback);
+        });
+        this.eventListeners = [];
+    }
+};
 
-// Attendre que le DOM soit complètement chargé
+// Attendre que le DOM soit complètement chargé - un seul event listener pour tout le site
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialiser le préchargeur
-    initPreloader();
-    
-    // Initialiser la navigation
-    initNavigation();
-    
-    // Initialiser les transitions de page
-    initPageTransitions();
-    
-    // Initialiser les animations au scroll
-    initScrollAnimations();
-    
-    // Initialiser le bouton retour en haut
-    initBackToTop();
-    
-    // Fonctionnalités spécifiques selon la page
-    initPageSpecificFeatures();
+    try {
+        // Initialiser le préchargeur
+        initPreloader();
+        
+        // Initialiser la navigation
+        initNavigation();
+        
+        // Initialiser les transitions de page
+        initPageTransitions();
+        
+        // Initialiser les animations au scroll
+        initScrollAnimations();
+        
+        // Initialiser le bouton retour en haut
+        initBackToTop();
+        
+        // Fonctionnalités spécifiques selon la page
+        initPageSpecificFeatures();
+    } catch (error) {
+        console.error('Erreur lors de l\'initialisation de l\'application:', error);
+    }
 });
 
 /**
  * Gère le préchargeur et l'animation de chargement initial
+ * Optimisé pour être plus performant et mieux gérer les ressources
  */
 function initPreloader() {
     const preloader = document.querySelector('.preloader');
     
     if (!preloader) return;
     
-    // Simuler un chargement minimum pour permettre l'animation
-    setTimeout(() => {
+    // Détecter si les ressources de la page sont chargées
+    window.addEventListener('load', () => {
+        AppState.isPageLoaded = true;
+        hidePreloader();
+    });
+    
+    // Simuler un chargement minimum pour permettre l'animation (avec un temps maximum d'attente)
+    const timeoutId = setTimeout(hidePreloader, 2500);
+    
+    function hidePreloader() {
+        // Éviter les appels multiples
+        if (preloader.classList.contains('hidden')) return;
+        
+        clearTimeout(timeoutId);
         preloader.classList.add('hidden');
         
         // Enlever complètement le préloader après la transition
@@ -52,11 +89,11 @@ function initPreloader() {
             document.body.classList.add('page-loaded');
             triggerEntranceAnimations();
         }, 500);
-    }, 1500);
+    }
 }
 
 /**
- * Initialise la navigation responsive
+ * Initialise la navigation responsive avec une meilleure gestion des événements
  */
 function initNavigation() {
     const navbar = document.getElementById('navbar');
@@ -66,8 +103,8 @@ function initNavigation() {
     
     if (!navbar || !navToggle || !navLinks) return;
     
-    // Toggle du menu mobile
-    navToggle.addEventListener('click', function() {
+    // Toggle du menu mobile avec gestion centralisée des événements
+    AppState.addEventListeners(navToggle, 'click', function() {
         navToggle.classList.toggle('active');
         navLinks.classList.toggle('active');
         document.body.classList.toggle('menu-open');
@@ -75,16 +112,17 @@ function initNavigation() {
     
     // Fermer le menu après un clic sur un lien
     navItems.forEach(item => {
-        item.addEventListener('click', function(e) {
-            const isExternalLink = this.getAttribute('href').indexOf('http') === 0;
-            const isAnchorLink = this.getAttribute('href').indexOf('#') === 0;
+        AppState.addEventListeners(item, 'click', function(e) {
+            const href = this.getAttribute('href') || '';
+            const isExternalLink = href.indexOf('http') === 0;
+            const isAnchorLink = href.indexOf('#') === 0;
             
             if (!isExternalLink && !isAnchorLink) {
                 // Empêcher la navigation par défaut pour les liens internes
                 e.preventDefault();
                 
                 // Déclencher la transition de page
-                const targetUrl = this.getAttribute('href');
+                const targetUrl = href;
                 transitionToPage(targetUrl);
             }
             
@@ -95,18 +133,26 @@ function initNavigation() {
         });
     });
     
-    // Changer l'apparence de la navbar au scroll
-    window.addEventListener('scroll', function() {
-        if (window.scrollY > 50) {
-            navbar.classList.add('scrolled');
-        } else {
-            navbar.classList.remove('scrolled');
+    // Optimiser l'événement de défilement avec throttling pour éviter les appels excessifs
+    let scrollTimeout;
+    const handleScroll = () => {
+        if (!scrollTimeout) {
+            scrollTimeout = setTimeout(() => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+                scrollTimeout = null;
+            }, 100);
         }
-    });
+    };
+    
+    AppState.addEventListeners(window, 'scroll', handleScroll, { passive: true });
 }
 
 /**
- * Initialise les transitions entre les pages
+ * Initialise les transitions entre les pages avec gestion améliorée des événements
  */
 function initPageTransitions() {
     const internalLinks = document.querySelectorAll('a[href]:not([href^="#"]):not([href^="http"]):not([href^="mailto"]):not([target="_blank"])');
@@ -114,25 +160,27 @@ function initPageTransitions() {
     
     if (!transitionOverlay) return;
     
-    // Gérer les clics sur les liens internes
+    // Gérer les clics sur les liens internes avec la gestion centralisée des événements
     internalLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
+        AppState.addEventListeners(link, 'click', function(e) {
             // Ne pas déclencher pour les liens de navigation déjà gérés
-            if (this.parentElement.classList.contains('nav-links')) return;
+            if (this.parentElement && this.parentElement.classList.contains('nav-links')) return;
+            
+            const href = this.getAttribute('href');
+            if (!href) return;
             
             e.preventDefault();
-            const targetUrl = this.getAttribute('href');
-            transitionToPage(targetUrl);
+            transitionToPage(href);
         });
     });
     
     // Gérer la navigation avec le bouton retour du navigateur
-    window.addEventListener('popstate', function(e) {
+    AppState.addEventListeners(window, 'popstate', function(e) {
         // Empêcher la navigation par défaut
         e.preventDefault();
         
         // Si une transition est déjà en cours, ne rien faire
-        if (isPageTransitioning) return;
+        if (AppState.isPageTransitioning) return;
         
         // Déclencher notre propre transition
         transitionToPage(location.pathname, false);
@@ -140,22 +188,38 @@ function initPageTransitions() {
 }
 
 /**
- * Effectue la transition vers une nouvelle page
+ * Effectue la transition vers une nouvelle page avec gestion améliorée
  * @param {string} url - L'URL cible
  * @param {boolean} pushState - Indique s'il faut ajouter l'URL à l'historique (défaut: true)
  */
 function transitionToPage(url, pushState = true) {
-    // Si une transition est déjà en cours ou si c'est la page actuelle, ne rien faire
-    if (isPageTransitioning || url === window.location.pathname) return;
+    // Validation de l'URL
+    if (!url) {
+        console.error('URL invalide pour la transition de page');
+        return;
+    }
     
-    isPageTransitioning = true;
+    // Si une transition est déjà en cours ou si c'est la page actuelle, ne rien faire
+    if (AppState.isPageTransitioning || url === window.location.pathname) return;
+    
+    // Nettoyer les event listeners avant la navigation
+    cleanupBeforeNavigation();
+    
+    AppState.isPageTransitioning = true;
     const transitionOverlay = document.querySelector('.page-transition-overlay');
+    
+    if (!transitionOverlay) {
+        // Fallback si l'overlay n'est pas trouvé
+        if (pushState) window.history.pushState({}, '', url);
+        window.location.href = url;
+        return;
+    }
     
     // Ajouter la classe active pour déclencher l'animation
     transitionOverlay.classList.add('active');
     
     // Attendre la fin de l'animation avant de changer de page
-    setTimeout(() => {
+    const navigationTimeout = setTimeout(() => {
         // Ajouter l'URL à l'historique si nécessaire
         if (pushState) {
             window.history.pushState({}, '', url);
@@ -163,28 +227,65 @@ function transitionToPage(url, pushState = true) {
         
         // Rediriger vers la nouvelle page
         window.location.href = url;
-    }, transitionDuration);
+    }, AppState.transitionDuration);
+    
+    // Sécurité: s'assurer que la navigation se produit même si l'animation échoue
+    AppState.addEventListeners(transitionOverlay, 'transitionend', () => {
+        clearTimeout(navigationTimeout);
+        if (pushState) window.history.pushState({}, '', url);
+        window.location.href = url;
+    }, { once: true });
 }
 
 /**
- * Initialise les animations déclenchées au scroll
+ * Nettoie les ressources avant une navigation
+ * - Supprime les écouteurs d'événements
+ * - Arrête les animations en cours
+ * - Libère la mémoire
+ */
+function cleanupBeforeNavigation() {
+    // Supprimer tous les écouteurs d'événements
+    AppState.removeAllEventListeners();
+    
+    // Arrêter les animations GSAP si elles existent
+    if (typeof gsap !== 'undefined' && gsap.killAll) {
+        gsap.killAll();
+    }
+    
+    // Annuler toutes les requêtes fetch en cours (si implémenté)
+    // Arrêter les intervalles et timeouts critiques
+    
+    // Permettre au garbage collector de faire son travail
+    // en supprimant les références circulaires
+}
+
+/**
+ * Initialise les animations déclenchées au scroll avec optimisation des performances
  */
 function initScrollAnimations() {
     const scrollElements = document.querySelectorAll('.scroll-reveal');
+    if (!scrollElements.length) return;
     
     // Observer les éléments pour les animer quand ils sont visibles
+    // avec des options optimisées pour les performances
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-                observer.unobserve(entry.target);
+                // Appliquer la classe avec un petit délai pour les éléments qui apparaissent ensemble
+                setTimeout(() => {
+                    if (entry.target) {
+                        entry.target.classList.add('visible');
+                    }
+                    observer.unobserve(entry.target);
+                }, Math.random() * 150); // Délai aléatoire pour un effet plus naturel
             }
         });
     }, {
-        threshold: 0.15,
-        rootMargin: '0px 0px -100px 0px'
+        threshold: 0.10, // Réduire le seuil pour déclencher l'animation plus tôt
+        rootMargin: '0px 0px -50px 0px' // Marge ajustée pour une meilleure expérience
     });
     
+    // Observer les éléments uniquement s'ils sont présents dans le DOM
     scrollElements.forEach(element => {
         observer.observe(element);
     });
@@ -218,24 +319,33 @@ function triggerEntranceAnimations() {
 }
 
 /**
- * Initialise le bouton de retour en haut de page
+ * Initialise le bouton de retour en haut de page avec gestion optimisée des événements
  */
 function initBackToTop() {
     const backToTopBtn = document.getElementById('back-to-top-btn');
     
     if (!backToTopBtn) return;
     
-    // Afficher/masquer le bouton en fonction de la position du scroll
-    window.addEventListener('scroll', function() {
-        if (window.scrollY > 500) {
-            backToTopBtn.classList.add('visible');
-        } else {
-            backToTopBtn.classList.remove('visible');
+    // Afficher/masquer le bouton en fonction de la position du scroll avec throttling
+    let scrollThrottleTimeout;
+    const handleBackToTopVisibility = () => {
+        if (!scrollThrottleTimeout) {
+            scrollThrottleTimeout = setTimeout(() => {
+                if (window.scrollY > 500) {
+                    backToTopBtn.classList.add('visible');
+                } else {
+                    backToTopBtn.classList.remove('visible');
+                }
+                scrollThrottleTimeout = null;
+            }, 100);
         }
-    });
+    };
+    
+    // Utiliser la gestion centralisée des événements
+    AppState.addEventListeners(window, 'scroll', handleBackToTopVisibility, { passive: true });
     
     // Remonter en haut de page en douceur au clic
-    backToTopBtn.addEventListener('click', function(e) {
+    AppState.addEventListeners(backToTopBtn, 'click', function(e) {
         e.preventDefault();
         window.scrollTo({
             top: 0,

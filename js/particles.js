@@ -1,23 +1,107 @@
 /**
- * Animation de particules interactive
+ * Animation de particules interactive optimisée
  * Crée un effet visuel immersif dans les sections hero et header
+ * avec des optimisations de performance pour tous les appareils
  */
+
+// Gestionnaire de performances pour les animations
+const PerformanceManager = {
+    // Détecter les capacités de l'appareil
+    lowPowerMode: false,
+    minFrameTime: 0, // Temps minimum entre les frames en ms (pour limiter le FPS)
+    lastFrameTime: 0,
+    active: true, // Indique si les animations sont actives
+    animationLoops: [], // Référence aux boucles d'animation
+    
+    // Détecter les capacités du dispositif
+    detectCapabilities: function() {
+        // Vérifier si on est sur mobile
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        // Vérifier si l'utilisateur préfère réduire les animations
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        
+        // Détecter la puissance de l'appareil en fonction du nombre de cœurs logiques
+        const cpuCores = navigator.hardwareConcurrency || 4;
+        
+        // Configuration basée sur les capacités
+        if (prefersReducedMotion || (isMobile && cpuCores <= 4)) {
+            this.lowPowerMode = true;
+            this.minFrameTime = 50; // Environ 20 FPS max
+        } else if (isMobile || cpuCores <= 4) {
+            this.lowPowerMode = false;
+            this.minFrameTime = 33; // Environ 30 FPS max
+        } else {
+            this.lowPowerMode = false;
+            this.minFrameTime = 0; // Pas de limite
+        }
+    },
+    
+    // Vérifier si on peut animer cette frame
+    canAnimate: function() {
+        if (!this.active) return false;
+        
+        const now = performance.now();
+        if (now - this.lastFrameTime < this.minFrameTime) return false;
+        
+        this.lastFrameTime = now;
+        return true;
+    },
+    
+    // Ajouter une boucle d'animation
+    addAnimationLoop: function(loop) {
+        this.animationLoops.push(loop);
+    },
+    
+    // Arrêter toutes les animations
+    stopAllAnimations: function() {
+        this.active = false;
+        this.animationLoops.forEach(loop => {
+            if (typeof loop === 'number') {
+                cancelAnimationFrame(loop);
+            }
+        });
+        this.animationLoops = [];
+    }
+};
+
+// Détecter les capacités de l'appareil
+PerformanceManager.detectCapabilities();
+
+// Configuration de la visibilité de la page
+document.addEventListener('visibilitychange', () => {
+    PerformanceManager.active = document.visibilityState === 'visible';
+});
 
 // Initialiser au chargement du DOM
 document.addEventListener("DOMContentLoaded", () => {
-    // Initialiser les particules pour la page d'accueil
-    if (document.getElementById('particles-canvas')) {
-        initParticles('particles-canvas');
+    try {
+        // Initialiser les particules pour la page d'accueil
+        if (document.getElementById('particles-canvas')) {
+            initParticles('particles-canvas');
+        }
+        
+        // Initialiser les particules pour le header de la page projets
+        if (document.getElementById('header-particles')) {
+            initHeaderParticles('header-particles');
+        }
+    } catch (error) {
+        console.error('Erreur lors de l\'initialisation des particules:', error);
     }
     
-    // Initialiser les particules pour le header de la page projets
-    if (document.getElementById('header-particles')) {
-        initHeaderParticles('header-particles');
+    // Nettoyage lors de la navigation
+    if (typeof AppState !== 'undefined') {
+        const oldCleanup = AppState.removeAllEventListeners;
+        AppState.removeAllEventListeners = function() {
+            oldCleanup.call(AppState);
+            PerformanceManager.stopAllAnimations();
+        };
     }
 });
 
 /**
  * Initialise l'animation de particules pour la page d'accueil
+ * Version optimisée pour réduire la consommation de ressources
  * @param {string} canvasId - ID de l'élément canvas
  */
 function initParticles(canvasId) {
@@ -25,42 +109,75 @@ function initParticles(canvasId) {
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
+    let animationFrameId = null;
+    let isInViewport = true;
     
-    // Adapter la taille du canvas à son conteneur
+    // Détecter si le canvas est visible dans le viewport
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            isInViewport = entry.isIntersecting;
+        });
+    }, { threshold: 0.1 });
+    
+    observer.observe(canvas);
+    
+    // Adapter la taille du canvas à son conteneur avec debounce
+    let resizeTimeout;
     function resizeCanvas() {
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            // Recréer les particules après le redimensionnement
+            particlesConfig.count = calculateParticleCount();
+            initParticlesArray();
+        }, 250); // Delai de 250ms pour éviter les calculs excessifs
     }
     
-    // Appeler au chargement et au redimensionnement
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+    // Ajouter l'écouteur d'événement avec la gestion centralisée
+    if (typeof AppState !== 'undefined') {
+        AppState.addEventListeners(window, 'resize', resizeCanvas, { passive: true });
+    } else {
+        window.addEventListener('resize', resizeCanvas, { passive: true });
+    }
     
-    // Configuration des particules
+    // Appeler au chargement
+    resizeCanvas();
+    
+    // Configuration des particules optimisée selon les performances
     const particlesConfig = {
         count: calculateParticleCount(),
         color: '#3b82f6',
         radius: { min: 1, max: 3 },
-        speed: { min: 0.5, max: 1.5 },
-        connectionDistance: 150,
+        speed: { min: 0.2, max: 1.0 }, // Vitesse réduite pour économiser des ressources
+        connectionDistance: PerformanceManager.lowPowerMode ? 100 : 150,
         lineWidth: 0.5,
-        lineColor: 'rgba(59, 130, 246, 0.15)'
+        lineColor: 'rgba(59, 130, 246, 0.15)',
+        skipConnectionsFrames: PerformanceManager.lowPowerMode ? 2 : 1 // Dessiner les connexions moins fréquemment en mode basse consommation
     };
     
-    // Calculer le nombre de particules en fonction de la taille de l'écran
+    // Calculer le nombre de particules en fonction de la taille de l'écran et des performances
     function calculateParticleCount() {
         const width = window.innerWidth;
-        if (width < 576) return 50;
-        if (width < 992) return 80;
-        return 120;
+        const multiplier = PerformanceManager.lowPowerMode ? 0.5 : 1;
+        
+        if (width < 576) return Math.floor(30 * multiplier);
+        if (width < 992) return Math.floor(50 * multiplier);
+        return Math.floor(80 * multiplier);
     }
     
     // Créer un tableau de particules
     let particles = [];
+    let frameCount = 0;
     
-    // Classe Particule
+    // Classe Particule optimisée
     class Particle {
         constructor() {
+            this.reset();
+        }
+        
+        reset() {
             this.x = Math.random() * canvas.width;
             this.y = Math.random() * canvas.height;
             this.vx = (Math.random() - 0.5) * particlesConfig.speed.max;
@@ -68,6 +185,7 @@ function initParticles(canvasId) {
             this.radius = Math.random() * (particlesConfig.radius.max - particlesConfig.radius.min) + particlesConfig.radius.min;
             this.color = particlesConfig.color;
             this.opacity = Math.random() * 0.5 + 0.2;
+            return this;
         }
         
         draw() {
@@ -82,41 +200,79 @@ function initParticles(canvasId) {
             this.x += this.vx;
             this.y += this.vy;
             
-            // Rebondir sur les bords
-            if (this.x < 0 || this.x > canvas.width) this.vx = -this.vx;
-            if (this.y < 0 || this.y > canvas.height) this.vy = -this.vy;
+            // Rebondir sur les bords avec réutilisation des particules
+            if (this.x < -50 || this.x > canvas.width + 50 || 
+                this.y < -50 || this.y > canvas.height + 50) {
+                // Réinitialiser plutôt que de simplement inverser la direction
+                this.reset();
+            } else {
+                // Rebondir normalement sur les bords proches
+                if (this.x < 0 || this.x > canvas.width) this.vx = -this.vx;
+                if (this.y < 0 || this.y > canvas.height) this.vy = -this.vy;
+            }
         }
     }
     
-    // Initialiser les particules
+    // Initialiser les particules avec réutilisation d'objets
     function initParticlesArray() {
-        particles = [];
-        for (let i = 0; i < particlesConfig.count; i++) {
-            particles.push(new Particle());
+        const targetCount = particlesConfig.count;
+        
+        // Si le tableau est vide, le remplir
+        if (particles.length === 0) {
+            for (let i = 0; i < targetCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+        // Si nous avons besoin de plus de particules
+        else if (particles.length < targetCount) {
+            for (let i = particles.length; i < targetCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+        // Si nous avons trop de particules, réduire le tableau
+        else if (particles.length > targetCount) {
+            particles = particles.slice(0, targetCount);
         }
     }
     
-    // Dessiner les connexions entre particules proches
+    // Dessiner les connexions entre particules proches (optimisé)
     function drawConnections() {
+        // Sauter des frames pour réduire la charge CPU
+        if (frameCount % particlesConfig.skipConnectionsFrames !== 0) return;
+        
+        // Batch drawing pour réduire les opérations sur le contexte
+        ctx.beginPath();
+        
         for (let i = 0; i < particles.length; i++) {
-            for (let j = i + 1; j < particles.length; j++) {
-                let dx = particles[i].x - particles[j].x;
-                let dy = particles[i].y - particles[j].y;
-                let distance = Math.sqrt(dx * dx + dy * dy);
+            // Optimisation: vérifier moins de particules en mode basse puissance
+            const checkStep = PerformanceManager.lowPowerMode ? 2 : 1;
+            
+            for (let j = i + checkStep; j < particles.length; j += checkStep) {
+                const p1 = particles[i];
+                const p2 = particles[j];
                 
-                if (distance < particlesConfig.connectionDistance) {
-                    // Opacité basée sur la distance
-                    let opacity = 1 - distance / particlesConfig.connectionDistance;
+                // Calcul optimisé de la distance (sans racine carrée quand possible)
+                const dx = p1.x - p2.x;
+                const dy = p1.y - p2.y;
+                const distSquared = dx * dx + dy * dy;
+                
+                // Éviter la racine carrée quand possible pour améliorer les performances
+                const connectionDistanceSquared = particlesConfig.connectionDistance * particlesConfig.connectionDistance;
+                
+                if (distSquared < connectionDistanceSquared) {
+                    // Calculer la racine carrée seulement quand nécessaire
+                    const distance = Math.sqrt(distSquared);
+                    const opacity = 1 - distance / particlesConfig.connectionDistance;
                     
-                    ctx.beginPath();
-                    ctx.moveTo(particles[i].x, particles[i].y);
-                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.moveTo(p1.x, p1.y);
+                    ctx.lineTo(p2.x, p2.y);
                     ctx.strokeStyle = `rgba(59, 130, 246, ${opacity * 0.15})`;
                     ctx.lineWidth = particlesConfig.lineWidth;
-                    ctx.stroke();
                 }
             }
         }
+        
+        ctx.stroke();
     }
     
     // Variables pour l'interaction à la souris
@@ -125,8 +281,8 @@ function initParticles(canvasId) {
     let isMouseMoving = false;
     let mouseTimeout;
     
-    // Suivre la position de la souris
-    canvas.addEventListener('mousemove', (e) => {
+    // Suivre la position de la souris avec la gestion centralisée d'événements
+    const handleMouseMove = (e) => {
         const rect = canvas.getBoundingClientRect();
         mouseX = e.clientX - rect.left;
         mouseY = e.clientY - rect.top;
@@ -137,34 +293,51 @@ function initParticles(canvasId) {
         mouseTimeout = setTimeout(() => {
             isMouseMoving = false;
         }, 100);
-    });
+    };
     
-    // Effet d'attraction/répulsion à la souris
+    // Ajouter l'écouteur d'événement
+    if (typeof AppState !== 'undefined') {
+        AppState.addEventListeners(canvas, 'mousemove', handleMouseMove);
+    } else {
+        canvas.addEventListener('mousemove', handleMouseMove);
+    }
+    
+    // Effet d'attraction/répulsion à la souris (optimisé)
     function applyMouseEffect() {
-        if (!isMouseMoving) return;
+        if (!isMouseMoving || PerformanceManager.lowPowerMode) return;
         
         const mouseRadius = 100; // Rayon d'influence
         const mouseStrength = 3; // Force de l'effet
+        const mouseRadiusSquared = mouseRadius * mouseRadius;
         
         particles.forEach(particle => {
             const dx = mouseX - particle.x;
             const dy = mouseY - particle.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
+            const distSquared = dx * dx + dy * dy;
             
-            if (distance < mouseRadius) {
-                // Force inversement proportionnelle à la distance
+            if (distSquared < mouseRadiusSquared) {
+                // Calculer la racine carrée seulement quand nécessaire
+                const distance = Math.sqrt(distSquared);
                 const force = (mouseRadius - distance) / mouseRadius;
                 
-                // Effet répulsif (négatif)
-                particle.vx -= (dx / distance) * force * mouseStrength * 0.05;
-                particle.vy -= (dy / distance) * force * mouseStrength * 0.05;
+                // Effet répulsif (négatif) avec intensité réduite
+                particle.vx -= (dx / distance) * force * mouseStrength * 0.03;
+                particle.vy -= (dy / distance) * force * mouseStrength * 0.03;
             }
         });
     }
     
-    // Animation des particules
+    // Animation des particules optimisée
     function animate() {
+        // Vérifier si l'animation doit être exécutée
+        if (!PerformanceManager.canAnimate() || !isInViewport) {
+            animationFrameId = requestAnimationFrame(animate);
+            PerformanceManager.addAnimationLoop(animationFrameId);
+            return;
+        }
+        
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        frameCount++;
         
         // Mettre à jour et dessiner chaque particule
         particles.forEach(particle => {
@@ -172,25 +345,37 @@ function initParticles(canvasId) {
             particle.draw();
         });
         
-        // Appliquer l'effet de la souris
+        // Appliquer l'effet de la souris (seulement si nécessaire)
         applyMouseEffect();
         
-        // Dessiner les connexions
+        // Dessiner les connexions (optimisé)
         drawConnections();
         
-        requestAnimationFrame(animate);
+        animationFrameId = requestAnimationFrame(animate);
+        PerformanceManager.addAnimationLoop(animationFrameId);
     }
     
     // Démarrer l'animation
     initParticlesArray();
     animate();
     
-    // Ajuster le nombre de particules lors du redimensionnement
-    window.addEventListener('resize', () => {
-        resizeCanvas();
-        particlesConfig.count = calculateParticleCount();
-        initParticlesArray();
-    });
+    // Fonction de nettoyage
+    function cleanup() {
+        if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+        }
+        observer.disconnect();
+        clearTimeout(resizeTimeout);
+        clearTimeout(mouseTimeout);
+        
+        // Supprimer les références pour le garbage collector
+        particles = [];
+    }
+    
+    // Exposer la fonction de nettoyage
+    return {
+        cleanup: cleanup
+    };
 }
 
 /**

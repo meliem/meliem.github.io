@@ -1,168 +1,323 @@
 /**
- * Animations spécifiques à la page d'accueil
+ * Animations spécifiques à la page d'accueil - Version optimisée
  * Effets visuels avancés pour créer une expérience immersive
+ * avec une meilleure gestion des performances
  */
+
+// Vérifier si les gestionnaires d'état sont disponibles
+const hasAppState = typeof AppState !== 'undefined';
+const hasPerformanceManager = typeof PerformanceManager !== 'undefined';
+
+// Gestionnaire local d'animations pour la page d'accueil
+const HomepageAnimations = {
+    activeAnimations: [],
+    animationsInitialized: false,
+    
+    // Ajouter une animation à la liste
+    registerAnimation: function(animation) {
+        this.activeAnimations.push(animation);
+    },
+    
+    // Nettoyer toutes les animations
+    cleanup: function() {
+        this.activeAnimations.forEach(animation => {
+            if (typeof animation.cleanup === 'function') {
+                animation.cleanup();
+            }
+        });
+        this.activeAnimations = [];
+    }
+};
 
 // Attendre que le DOM soit complètement chargé
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialiser GSAP si disponible
-    if (typeof gsap !== 'undefined') {
-        initGsapAnimations();
+    // Éviter les initialisations multiples
+    if (HomepageAnimations.animationsInitialized) return;
+    HomepageAnimations.animationsInitialized = true;
+    
+    try {
+        // Initialiser GSAP si disponible
+        if (typeof gsap !== 'undefined') {
+            initGsapAnimations();
+        }
+        
+        // Initialiser les animations du hero
+        initHeroAnimations();
+        
+        // Initialiser les animations des cartes de navigation
+        initNavCardsAnimation();
+        
+        // Initialiser l'effet de flux de données (seulement si pas en mode basse consommation)
+        if (!hasPerformanceManager || !PerformanceManager.lowPowerMode) {
+            initDataFlowEffect();
+            
+            // Initialiser l'effet de circuit imprimé
+            initCircuitBoardEffect();
+        }
+        
+        // Initialiser l'effet glitch du titre (version simplifiée sur mobile)
+        initGlitchEffect();
+        
+        // S'intégrer avec AppState pour le nettoyage lors de la navigation
+        if (hasAppState) {
+            const originalCleanup = AppState.removeAllEventListeners;
+            AppState.removeAllEventListeners = function() {
+                originalCleanup.call(AppState);
+                HomepageAnimations.cleanup();
+            };
+        }
+    } catch (error) {
+        console.error('Erreur lors de l\'initialisation des animations de la page d\'accueil:', error);
     }
-    
-    // Initialiser les animations du hero
-    initHeroAnimations();
-    
-    // Initialiser les animations des cartes de navigation
-    initNavCardsAnimation();
-    
-    // Initialiser l'effet de flux de données
-    initDataFlowEffect();
-    
-    // Initialiser l'effet de circuit imprimé
-    initCircuitBoardEffect();
-    
-    // Initialiser l'effet glitch du titre
-    initGlitchEffect();
 });
 
 /**
- * Initialise les animations GSAP avancées
+ * Initialise les animations GSAP avancées avec optimisations de performance
  */
 function initGsapAnimations() {
-    // Enregistrer les plugins
+    // Vérifier que GSAP est disponible
+    if (typeof gsap === 'undefined') return;
+    
+    // Vérifier si nous sommes en mode économie d'énergie
+    const isLowPowerMode = hasPerformanceManager && PerformanceManager.lowPowerMode;
+    
+    // Enregistrer les plugins si disponibles
     if (typeof ScrollTrigger !== 'undefined') {
         gsap.registerPlugin(ScrollTrigger);
+        
+        // Configuration globale de ScrollTrigger pour optimiser les performances
+        ScrollTrigger.config({
+            limitCallbacks: true, // Limite le nombre d'appels de callback
+            ignoreMobileResize: true, // Évite des recalculs inutiles sur mobile
+        });
     }
     
-    // Animation du titre avec un split text (simulation)
-    const heroTitle = document.querySelector('.hero h1');
-    if (heroTitle) {
-        // Créer une animation de révélation pour chaque lettre
-        const titleText = heroTitle.textContent;
-        const charElements = [];
-        
-        // Vider le contenu original
-        heroTitle.textContent = '';
-        
-        // Créer un span pour chaque caractère
-        for (let i = 0; i < titleText.length; i++) {
-            const charSpan = document.createElement('span');
-            charSpan.textContent = titleText[i];
-            charSpan.style.opacity = '0';
-            charSpan.style.display = 'inline-block';
-            charSpan.style.transform = 'translateY(50px)';
-            charElements.push(charSpan);
-            heroTitle.appendChild(charSpan);
+    try {
+        // Animation du titre avec un split text optimisé
+        const heroTitle = document.querySelector('.hero h1');
+        if (heroTitle) {
+            // Solution optimisée qui réduit les manipulations DOM
+            const titleText = heroTitle.textContent || '';
+            let titleHTML = '';
+            
+            // Créer tout le HTML en une seule fois pour minimiser les manipulations DOM
+            for (let i = 0; i < titleText.length; i++) {
+                titleHTML += `<span class="char-${i}" style="opacity:0;display:inline-block;transform:translateY(50px)">${titleText[i]}</span>`;
+            }
+            heroTitle.innerHTML = titleHTML;
+            
+            // Sélectionner tous les spans en une seule fois
+            const charElements = heroTitle.querySelectorAll('span');
+            
+            // Animer chaque caractère avec des paramètres optimisés
+            gsap.to(charElements, {
+                opacity: 1,
+                y: 0,
+                duration: isLowPowerMode ? 0.4 : 0.8,
+                stagger: isLowPowerMode ? 0.02 : 0.05,
+                ease: "power2.out",
+                delay: 0.5,
+                overwrite: true // Éviter les conflits d'animation
+            });
         }
         
-        // Animer chaque caractère séquentiellement
-        gsap.to(charElements, {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
-            stagger: 0.05,
-            ease: "power2.out",
-            delay: 0.5
-        });
-    }
-    
-    // Animation de la section de navigation visuelle
-    const navCards = document.querySelectorAll('.nav-card');
-    if (navCards.length) {
-        gsap.from(navCards, {
-            opacity: 0,
-            y: 100,
-            duration: 0.8,
-            stagger: 0.1,
-            ease: "back.out(1.7)",
-            scrollTrigger: {
+        // Animation de la section de navigation visuelle avec meilleure performance
+        const navCards = document.querySelectorAll('.nav-card');
+        if (navCards.length) {
+            // Créer une animation avec de meilleures performances
+            const navCardsAnimation = gsap.from(navCards, {
+                opacity: 0,
+                y: 100,
+                duration: isLowPowerMode ? 0.4 : 0.8,
+                stagger: isLowPowerMode ? 0.05 : 0.1,
+                ease: "back.out(1.5)", // Moins intense pour meilleures performances
+                paused: true, // Ne pas démarrer automatiquement
+                onComplete: () => {
+                    // Libérer les ressources après l'animation
+                    if (navCardsAnimation) {
+                        navCardsAnimation.kill();
+                    }
+                }
+            });
+            
+            // Créer un ScrollTrigger pour déclencher l'animation
+            const navScrollTrigger = ScrollTrigger.create({
                 trigger: '.visual-navigation',
-                start: 'top 80%'
-            }
-        });
-    }
-    
-    // Parallaxe pour le fond du hero
-    const heroBackground = document.querySelector('.hero-background');
-    if (heroBackground) {
-        gsap.to(heroBackground, {
-            y: '20%',
-            ease: "none",
-            scrollTrigger: {
-                trigger: '.hero',
-                start: 'top top',
-                end: 'bottom top',
-                scrub: true
-            }
-        });
+                start: 'top 85%',
+                onEnter: () => navCardsAnimation.play(),
+                once: true // Déclencher une seule fois pour économiser des ressources
+            });
+            
+            // Enregistrer pour nettoyage
+            HomepageAnimations.registerAnimation({
+                cleanup: () => {
+                    if (navScrollTrigger) navScrollTrigger.kill();
+                    if (navCardsAnimation) navCardsAnimation.kill();
+                }
+            });
+        }
+        
+        // Parallaxe pour le fond du hero avec des performances optimisées
+        const heroBackground = document.querySelector('.hero-background');
+        if (heroBackground && !isLowPowerMode) { // Éviter sur les dispositifs faibles
+            const parallaxAnimation = gsap.to(heroBackground, {
+                y: '15%', // Réduire l'intensité pour de meilleures performances
+                ease: "none",
+                scrollTrigger: {
+                    trigger: '.hero',
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: 0.2, // Ajouter un léger retard pour plus de fluidité
+                    invalidateOnRefresh: false // Éviter les recalculs inutiles
+                }
+            });
+            
+            // Enregistrer pour nettoyage
+            HomepageAnimations.registerAnimation({
+                cleanup: () => {
+                    if (parallaxAnimation && parallaxAnimation.scrollTrigger) {
+                        parallaxAnimation.scrollTrigger.kill();
+                    }
+                    if (parallaxAnimation) parallaxAnimation.kill();
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Erreur dans les animations GSAP:', error);
     }
 }
 
 /**
- * Initialise les animations spécifiques à la section hero
+ * Initialise les animations spécifiques à la section hero avec performances optimisées
  */
 function initHeroAnimations() {
-    // Animation des éléments du hero
-    const heroElements = document.querySelectorAll('.hero-content > *');
-    heroElements.forEach((element, index) => {
-        // Ajouter la classe pour l'animation
-        element.classList.add('hero-element');
-        element.style.opacity = '0';
-        element.style.transform = 'translateY(30px)';
+    try {
+        // Vérifier si nous sommes en mode économie d'énergie
+        const isLowPowerMode = hasPerformanceManager && PerformanceManager.lowPowerMode;
         
-        // Animation avec délai progressif
-        setTimeout(() => {
-            element.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-            element.style.opacity = '1';
-            element.style.transform = 'translateY(0)';
-        }, 500 + (index * 200));
-    });
-    
-    // Animation du bouton de défilement
-    const scrollIndicator = document.querySelector('.scroll-indicator');
-    if (scrollIndicator) {
-        scrollIndicator.style.opacity = '0';
-        setTimeout(() => {
-            scrollIndicator.style.transition = 'opacity 1s ease';
-            scrollIndicator.style.opacity = '1';
-        }, 2000);
+        // Animation des éléments du hero avec requestAnimationFrame pour de meilleures performances
+        const heroElements = document.querySelectorAll('.hero-content > *');
         
-        // Ajouter un événement de clic pour faire défiler vers la section suivante
-        scrollIndicator.addEventListener('click', () => {
-            const nextSection = document.querySelector('.visual-navigation');
-            if (nextSection) {
-                window.scrollTo({
-                    top: nextSection.offsetTop - 80,
-                    behavior: 'smooth'
-                });
+        // Préparer les éléments pour l'animation
+        heroElements.forEach((element) => {
+            // Ajouter la classe pour l'animation
+            element.classList.add('hero-element');
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(30px)';
+        });
+        
+        // Utiliser requestAnimationFrame pour une animation plus fluide
+        // et diminuer l'impact sur les performances
+        let startTime = null;
+        const duration = isLowPowerMode ? 800 : 1200; // Durée plus courte en mode économie
+        
+        function animateHeroElements(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const elapsedTime = timestamp - startTime;
+            
+            heroElements.forEach((element, index) => {
+                // Calculer le délai basé sur l'index et ajuster pour les performances
+                const delay = isLowPowerMode ? 300 + (index * 100) : 500 + (index * 200);
+                
+                // Animer si le temps est supérieur au délai
+                if (elapsedTime > delay) {
+                    const elementTime = elapsedTime - delay;
+                    if (elementTime <= duration) {
+                        // Animation progressive
+                        const progress = Math.min(elementTime / duration, 1);
+                        // Fonction d'easing cubique
+                        const easedProgress = progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+                        
+                        element.style.opacity = easedProgress.toString();
+                        element.style.transform = `translateY(${30 * (1 - easedProgress)}px)`;
+                    } else {
+                        // Assurer que l'élément est complètement visible
+                        element.style.opacity = '1';
+                        element.style.transform = 'translateY(0)';
+                    }
+                }
+            });
+            
+            // Continuer l'animation si nécessaire
+            if (elapsedTime < duration + (heroElements.length * 200)) {
+                requestAnimationFrame(animateHeroElements);
+            }
+        }
+        
+        // Démarrer l'animation
+        const animationId = requestAnimationFrame(animateHeroElements);
+        
+        // Animation du bouton de défilement avec meilleure gestion de mémoire
+        const scrollIndicator = document.querySelector('.scroll-indicator');
+        if (scrollIndicator) {
+            scrollIndicator.style.opacity = '0';
+            
+            // Utiliser requestAnimationFrame au lieu de setTimeout
+            const showScrollIndicator = () => {
+                scrollIndicator.style.transition = 'opacity 0.8s ease';
+                scrollIndicator.style.opacity = '1';
+            };
+            
+            // Déclencher après un délai
+            setTimeout(showScrollIndicator, isLowPowerMode ? 1200 : 2000);
+            
+            // Utiliser la gestion centralisée des événements si disponible
+            const scrollToNextSection = () => {
+                const nextSection = document.querySelector('.visual-navigation');
+                if (nextSection) {
+                    window.scrollTo({
+                        top: nextSection.offsetTop - 80,
+                        behavior: isLowPowerMode ? 'auto' : 'smooth' // Défilement instantané en mode basse consommation
+                    });
+                }
+            };
+            
+            if (hasAppState) {
+                AppState.addEventListeners(scrollIndicator, 'click', scrollToNextSection);
+            } else {
+                scrollIndicator.addEventListener('click', scrollToNextSection);
+            }
+        }
+        
+        // Enregistrer l'animation pour nettoyage
+        HomepageAnimations.registerAnimation({
+            cleanup: () => {
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                }
             }
         });
+    } catch (error) {
+        console.error('Erreur dans les animations du Hero:', error);
     }
 }
 
 /**
- * Initialise les animations des cartes de navigation
+ * Initialise les animations des cartes de navigation avec performances optimisées
  */
 function initNavCardsAnimation() {
-    const navCards = document.querySelectorAll('.nav-card');
-    
-    navCards.forEach(card => {
-        // Effet au survol
-        card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-10px) scale(1.03)';
-            this.style.boxShadow = '0 20px 30px rgba(0, 0, 0, 0.15)';
+    try {
+        const navCards = document.querySelectorAll('.nav-card');
+        if (!navCards.length) return;
+        
+        // Vérifier si nous sommes en mode économie d'énergie
+        const isLowPowerMode = hasPerformanceManager && PerformanceManager.lowPowerMode;
+        
+        // Créer des gestionnaires d'événements optimisés pour réduire les allocations
+        const handleMouseEnter = function() {
+            this.style.transform = 'translateY(-8px) scale(1.02)';
+            this.style.boxShadow = '0 15px 25px rgba(0, 0, 0, 0.12)';
             
-            // Animation de l'icône
+            // Animation de l'icône (optimisée)
             const icon = this.querySelector('.card-icon');
             if (icon) {
-                icon.style.transform = 'scale(1.2) rotate(10deg)';
+                // Animation simplifiée en mode basse consommation
+                icon.style.transform = isLowPowerMode ? 'scale(1.1)' : 'scale(1.15) rotate(5deg)';
                 icon.style.color = 'white';
             }
-        });
+        };
         
-        // Retour à l'état normal
-        card.addEventListener('mouseleave', function() {
+        const handleMouseLeave = function() {
             this.style.transform = 'translateY(0) scale(1)';
             this.style.boxShadow = '0 10px 15px rgba(0, 0, 0, 0.1)';
             
@@ -172,133 +327,227 @@ function initNavCardsAnimation() {
                 icon.style.transform = 'scale(1) rotate(0deg)';
                 icon.style.color = 'var(--primary-color)';
             }
-        });
-    });
-    
-    // Animation au scroll
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry, index) => {
-            if (entry.isIntersecting) {
-                // Animer avec un délai progressif
-                setTimeout(() => {
-                    entry.target.classList.add('reveal-card');
-                }, index * 100);
+        };
+        
+        // Ajouter les écouteurs d'événements avec la gestion centralisée si disponible
+        navCards.forEach(card => {
+            if (hasAppState) {
+                AppState.addEventListeners(card, 'mouseenter', handleMouseEnter);
+                AppState.addEventListeners(card, 'mouseleave', handleMouseLeave);
+            } else {
+                card.addEventListener('mouseenter', handleMouseEnter);
+                card.addEventListener('mouseleave', handleMouseLeave);
             }
         });
-    }, { threshold: 0.2 });
-    
-    navCards.forEach(card => {
-        observer.observe(card);
-    });
-    
-    // Ajouter la classe CSS pour l'animation
-    const style = document.createElement('style');
-    style.textContent = `
-        .nav-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            opacity: 0;
-            transform: translateY(50px);
+        
+        // Animation au scroll avec performances optimisées
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    // Réduire le délai en mode basse consommation
+                    const delay = isLowPowerMode ? index * 50 : index * 100;
+                    setTimeout(() => {
+                        if (entry.target) { // Vérifier que la cible existe toujours
+                            entry.target.classList.add('reveal-card');
+                        }
+                    }, delay);
+                }
+            });
+        }, { 
+            threshold: 0.1, // Seuil plus bas pour déclencher plus tôt
+            rootMargin: '50px' // Marge supplémentaire
+        });
+        
+        navCards.forEach(card => {
+            observer.observe(card);
+        });
+        
+        // Ajouter les styles directement dans une balise existante ou en créer une nouvelle
+        let styleElement = document.getElementById('nav-card-styles');
+        
+        if (!styleElement) {
+            styleElement = document.createElement('style');
+            styleElement.id = 'nav-card-styles';
+            document.head.appendChild(styleElement);
         }
+        
+        // Version optimisée des styles avec de meilleures transitions
+        styleElement.textContent = `
+            .nav-card {
+                transition: transform 0.25s ease, box-shadow 0.25s ease;
+                opacity: 0;
+                transform: translateY(30px);
+                will-change: transform, opacity;
+            }
+            
+            .nav-card.reveal-card {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            
+            .card-icon {
+                transition: transform 0.25s ease, color 0.25s ease;
+                will-change: transform;
+            }
+        `;
+        
+        // Enregistrer l'observateur pour nettoyage
+        HomepageAnimations.registerAnimation({
+            cleanup: () => {
+                observer.disconnect();
+                // Nettoyer l'élément de style si nécessaire
+                if (styleElement && styleElement.parentNode) {
+                    styleElement.parentNode.removeChild(styleElement);
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Erreur dans les animations des cartes de navigation:', error);
+    }
+}
         .nav-card.reveal-card {
             opacity: 1;
             transform: translateY(0);
             transition: opacity 0.8s ease, transform 0.8s ease;
         }
+        
         .card-icon {
-            transition: transform 0.3s ease, color 0.3s ease;
+            transition: transform 0.25s ease, color 0.25s ease;
+            will-change: transform;
         }
     `;
+    
     document.head.appendChild(style);
 }
 
 /**
- * Crée un effet visuel de flux de données dans l'arrière-plan
+ * Initialise l'effet de flux de données avec optimisations de performance
  */
 function initDataFlowEffect() {
-    const dataFlow = document.querySelector('.data-flow');
-    if (!dataFlow) return;
-    
-    // Créer des particules de données
-    const particleCount = window.innerWidth < 768 ? 20 : 40;
-    
-    for (let i = 0; i < particleCount; i++) {
-        createDataParticle(dataFlow);
-    }
-    
-    // Fonction pour créer une particule de données
-    function createDataParticle(container) {
-        const particle = document.createElement('div');
-        particle.className = 'data-particle';
+    try {
+        // Vérifier si nous sommes en mode économie d'énergie
+        const isLowPowerMode = hasPerformanceManager && PerformanceManager.lowPowerMode;
         
-        // Positionner aléatoirement
-        const startX = Math.random() * 100;
-        const startY = Math.random() * 100;
+        // Récupérer l'élément canvas s'il existe
+        const canvas = document.getElementById('data-flow-canvas');
+        if (!canvas) return;
         
-        // Définir la taille et l'opacité
-        const size = Math.random() * 3 + 1;
-        const opacity = Math.random() * 0.3 + 0.2;
+        // Vérifier si canvas est visible avant d'initialiser
+        const isCanvasVisible = () => {
+            const rect = canvas.getBoundingClientRect();
+            return (
+                rect.top <= (window.innerHeight || document.documentElement.clientHeight) &&
+                rect.bottom >= 0
+            );
+        };
         
-        // Définir la vitesse
-        const duration = Math.random() * 8 + 6; // entre 6 et 14 secondes
+        // Configurer le canvas
+        const ctx = canvas.getContext('2d');
+        let animationId = null;
         
-        // Définir le style
-        particle.style.cssText = `
-            position: absolute;
-            width: ${size}px;
-            height: ${size * (Math.random() * 5 + 5)}px; /* Forme rectangulaire */
-            background-color: rgba(59, 130, 246, ${opacity});
-            left: ${startX}%;
-            top: ${startY}%;
-            border-radius: 2px;
-            box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
-            transform-origin: center;
-            animation: dataParticleAnimation ${duration}s linear infinite;
-        `;
-        
-        // Ajouter au conteneur
-        container.appendChild(particle);
-    }
-    
-    // Ajouter l'animation CSS
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes dataParticleAnimation {
-            0% {
-                transform: translateY(0) scale(1);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(${window.innerHeight}px) scale(0.5);
-                opacity: 0;
-            }
+        // Ajuster la taille du canvas
+        function resizeCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
         }
-    `;
-    document.head.appendChild(style);
+        resizeCanvas();
+        
+        // Créer les lignes de données avec moins d'éléments si en mode basse consommation
+        const dataLines = [];
+        const lineCount = isLowPowerMode ? 15 : 30;
+        
+        for (let i = 0; i < lineCount; i++) {
+            dataLines.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                length: (Math.random() * 50) + 20,
+                speed: isLowPowerMode ? 1 + Math.random() * 2 : 1 + Math.random() * 3,
+                thickness: Math.random() * 2 + 1,
+                color: `rgba(0, ${120 + Math.random() * 135}, ${180 + Math.random() * 75}, ${0.3 + Math.random() * 0.4})`
+            });
+        }
+        
+        // Fonction d'animation optimisée
+        function animate() {
+            if (!isCanvasVisible()) {
+                // Si le canvas n'est pas visible, on ralentit les calculs
+                animationId = requestAnimationFrame(animate);
+                return;
+            }
+            
+            // Effacer le canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Dessiner et mettre à jour chaque ligne
+            dataLines.forEach(line => {
+                // Dessiner la ligne
+                ctx.beginPath();
+                ctx.strokeStyle = line.color;
+                ctx.lineWidth = line.thickness;
+                ctx.moveTo(line.x, line.y);
+                ctx.lineTo(line.x, line.y + line.length);
+                ctx.stroke();
+                
+                // Mettre à jour la position
+                line.y += line.speed;
+                
+                // Réinitialiser si hors de l'écran
+                if (line.y > canvas.height) {
+                    line.y = -line.length;
+                    line.x = Math.random() * canvas.width;
+                }
+            });
+            
+            // Continuer l'animation
+            animationId = requestAnimationFrame(animate);
+        }
+        
+        // Démarrer l'animation
+        animationId = requestAnimationFrame(animate);
+        
+        // Ajouter un écouteur pour redimensionner
+        const handleResize = () => {
+            resizeCanvas();
+        };
+        
+        if (hasAppState) {
+            AppState.addEventListeners(window, 'resize', handleResize);
+        } else {
+            window.addEventListener('resize', handleResize);
+        }
+        
+        // Enregistrer pour nettoyage
+        HomepageAnimations.registerAnimation({
+            cleanup: () => {
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                }
+                if (!hasAppState) {
+                    window.removeEventListener('resize', handleResize);
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Erreur dans l\'effet de flux de données:', error);
+    }
+}
 }
 
 /**
- * Crée un effet visuel de circuit imprimé dans l'arrière-plan
+ * Initialise l'effet de circuit imprimé dans l'arrière-plan avec optimisations de performance
  */
 function initCircuitBoardEffect() {
-    const circuitBoard = document.querySelector('.circuit-board');
-    if (!circuitBoard) return;
-    
-    // Nombre de lignes de circuit
-    const lineCount = window.innerWidth < 768 ? 10 : 20;
-    
-    // Créer les lignes de circuit
-    for (let i = 0; i < lineCount; i++) {
-        createCircuitLine(circuitBoard);
-    }
-    
-    // Créer les noeuds de circuit
-    const nodeCount = window.innerWidth < 768 ? 15 : 30;
+    try {
+        // Vérifier si nous sommes en mode économie d'énergie
+        const isLowPowerMode = hasPerformanceManager && PerformanceManager.lowPowerMode;
+        
+        // Récupérer l'élément conteneur
+        const circuitBoard = document.querySelector('.circuit-board-container');
+        if (!circuitBoard) return;
+        
+        // Adapter le nombre d'éléments selon performance et taille d'écran
+        const lineCount = isLowPowerMode ? 8 : (window.innerWidth < 768 ? 10 : 20);
+        const nodeCount = isLowPowerMode ? 5 : (window.innerWidth < 768 ? 15 : 30);
     for (let i = 0; i < nodeCount; i++) {
         createCircuitNode(circuitBoard);
     }
@@ -397,13 +646,21 @@ function initCircuitBoardEffect() {
 }
 
 /**
- * Initialise l'effet de glitch pour le titre
+ * Initialise l'effet glitch du titre avec optimisations de performance
  */
 function initGlitchEffect() {
-    const glitchContainer = document.querySelector('.glitch-container');
-    if (!glitchContainer) return;
-    
-    const glitchText = glitchContainer.querySelector('.glitch');
+    try {
+        // Vérifier si nous sommes en mode économie d'énergie
+        const isLowPowerMode = hasPerformanceManager && PerformanceManager.lowPowerMode;
+        
+        // Éviter complètement l'animation en mode très faible performance
+        if (isLowPowerMode && window.innerWidth < 768) return;
+        
+        // Récupérer l'élément titre
+        const glitchContainer = document.querySelector('.glitch-container');
+        if (!glitchContainer) return;
+        
+        const glitchText = glitchContainer.querySelector('.glitch');
     if (!glitchText) return;
     
     // Texte original
@@ -422,9 +679,17 @@ function initGlitchEffect() {
     glitchContainer.insertBefore(beforeLayer, glitchText);
     glitchContainer.appendChild(afterLayer);
     
-    // Ajouter les styles pour l'effet
-    const style = document.createElement('style');
-    style.textContent = `
+    // Ajouter les styles avec des identifiants uniques pour éviter les conflits
+    const styleId = 'glitch-effect-styles';
+    let styleElement = document.getElementById(styleId);
+    
+    if (!styleElement) {
+        styleElement = document.createElement('style');
+        styleElement.id = styleId;
+        document.head.appendChild(styleElement);
+    }
+    
+    styleElement.textContent = `
         .glitch-container {
             position: relative;
             display: inline-block;
