@@ -405,19 +405,20 @@ function initNavCardsAnimation() {
         console.error('Erreur dans les animations des cartes de navigation:', error);
     }
 }
-        .nav-card.reveal-card {
-            opacity: 1;
-            transform: translateY(0);
-            transition: opacity 0.8s ease, transform 0.8s ease;
-        }
-        
-        .card-icon {
-            transition: transform 0.25s ease, color 0.25s ease;
-            will-change: transform;
-        }
-    `;
+
+}
+
+// Add style and return cleanup function for proper resource management
+function addStyleAndReturnCleanup(styleText) {
+    const styleElement = document.createElement('style');
+    styleElement.textContent = styleText;
+    document.head.appendChild(styleElement);
     
-    document.head.appendChild(style);
+    return () => {
+        if (styleElement && styleElement.parentNode) {
+            styleElement.parentNode.removeChild(styleElement);
+        }
+    };
 }
 
 /**
@@ -428,9 +429,15 @@ function initDataFlowEffect() {
         // Vérifier si nous sommes en mode économie d'énergie
         const isLowPowerMode = hasPerformanceManager && PerformanceManager.lowPowerMode;
         
-        // Récupérer l'élément canvas s'il existe
-        const canvas = document.getElementById('data-flow-canvas');
-        if (!canvas) return;
+        // Créer et configurer le canvas
+        const dataFlow = document.querySelector('.data-flow');
+        if (!dataFlow) return;
+        
+        const canvas = document.createElement('canvas');
+        canvas.id = 'data-flow-canvas';
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
+        dataFlow.appendChild(canvas);
         
         // Vérifier si canvas est visible avant d'initialiser
         const isCanvasVisible = () => {
@@ -463,7 +470,7 @@ function initDataFlowEffect() {
                 length: (Math.random() * 50) + 20,
                 speed: isLowPowerMode ? 1 + Math.random() * 2 : 1 + Math.random() * 3,
                 thickness: Math.random() * 2 + 1,
-                color: `rgba(0, ${120 + Math.random() * 135}, ${180 + Math.random() * 75}, ${0.3 + Math.random() * 0.4})`
+                color: 'rgba(0, ' + Math.floor(120 + Math.random() * 135) + ', ' + Math.floor(180 + Math.random() * 75) + ', ' + (0.3 + Math.random() * 0.4).toFixed(2) + ')'
             });
         }
         
@@ -542,15 +549,22 @@ function initCircuitBoardEffect() {
         const isLowPowerMode = hasPerformanceManager && PerformanceManager.lowPowerMode;
         
         // Récupérer l'élément conteneur
-        const circuitBoard = document.querySelector('.circuit-board-container');
+        const circuitBoard = document.querySelector('.circuit-board');
         if (!circuitBoard) return;
         
         // Adapter le nombre d'éléments selon performance et taille d'écran
         const lineCount = isLowPowerMode ? 8 : (window.innerWidth < 768 ? 10 : 20);
         const nodeCount = isLowPowerMode ? 5 : (window.innerWidth < 768 ? 15 : 30);
-    for (let i = 0; i < nodeCount; i++) {
-        createCircuitNode(circuitBoard);
-    }
+        
+        // Créer des lignes de circuit
+        for (let i = 0; i < lineCount; i++) {
+            createCircuitLine(circuitBoard);
+        }
+        
+        // Créer des nœuds de circuit
+        for (let i = 0; i < nodeCount; i++) {
+            createCircuitNode(circuitBoard);
+        }
     
     // Fonction pour créer une ligne de circuit
     function createCircuitLine(container) {
@@ -576,8 +590,8 @@ function initCircuitBoardEffect() {
             top: ${startY}%;
             box-shadow: 0 0 3px rgba(59, 130, 246, 0.3);
             ${isHorizontal 
-                ? `width: ${length}%; height: ${thickness}px;` 
-                : `height: ${length}%; width: ${thickness}px;`
+                ? 'width: ' + length + '%; height: ' + thickness + 'px;' 
+                : 'height: ' + length + '%; width: ' + thickness + 'px;'
             }
         `;
         
@@ -628,9 +642,10 @@ function initCircuitBoardEffect() {
         element.style.animation = `circuitPulse ${duration}s ease-in-out ${delay}s infinite`;
     }
     
-    // Ajouter l'animation CSS
-    const style = document.createElement('style');
-    style.textContent = `
+    try {
+        // Ajouter l'animation CSS
+        const styleElement = document.createElement('style');
+    styleElement.textContent = `
         @keyframes circuitPulse {
             0%, 100% {
                 opacity: 0.2;
@@ -642,7 +657,26 @@ function initCircuitBoardEffect() {
             }
         }
     `;
-    document.head.appendChild(style);
+    document.head.appendChild(styleElement);
+    
+    // Enregistrer l'animation pour le nettoyage global
+    HomepageAnimations.registerAnimation({
+        cleanup: () => {
+            // Nettoyer les styles
+            if (styleElement && styleElement.parentNode) {
+                styleElement.parentNode.removeChild(styleElement);
+            }
+            
+            // Nettoyer les éléments du circuit
+            if (circuitBoard) {
+                const elements = circuitBoard.querySelectorAll('.circuit-line, .circuit-node');
+                elements.forEach(el => el.remove());
+            }
+        }
+    });
+    } catch (error) {
+        console.error('Erreur dans l\'effet circuit board:', error);
+    }
 }
 
 /**
@@ -661,12 +695,12 @@ function initGlitchEffect() {
         if (!glitchContainer) return;
         
         const glitchText = glitchContainer.querySelector('.glitch');
-    if (!glitchText) return;
-    
-    // Texte original
-    const text = glitchText.textContent;
-    
-    // Créer les couches de glitch
+        if (!glitchText) return;
+        
+        // Texte original
+        const text = glitchText.textContent;
+        
+        // Créer les couches de glitch
     const beforeLayer = document.createElement('span');
     beforeLayer.className = 'glitch-layer glitch-before';
     beforeLayer.setAttribute('data-text', text);
@@ -861,5 +895,24 @@ function initGlitchEffect() {
             }
         }
     `;
-    document.head.appendChild(style);
+    document.head.appendChild(styleElement);
+    
+        // Enregistrer l'animation pour le nettoyage global
+    HomepageAnimations.registerAnimation({
+        cleanup: () => {
+            if (styleElement && styleElement.parentNode) {
+                styleElement.parentNode.removeChild(styleElement);
+            }
+            
+            // Restaurer le texte original si nécessaire
+            if (glitchContainer) {
+                const layers = glitchContainer.querySelectorAll('.glitch-layer');
+                layers.forEach(layer => layer.remove());
+            }
+        }
+    });
+    
+    } catch (error) {
+        console.error('Erreur dans l\'effet glitch:', error);
+    }
 }

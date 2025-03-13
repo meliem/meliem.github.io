@@ -3,23 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a192f">
     <title>Elie Maby - Portfolio</title>
     <meta name="description" content="Portfolio interactif d'Elie Maby - Ingénieur, développeur et spécialiste en électronique">
     
+    <!-- Performance optimizations -->
+    <link rel="preload" href="css/style.css" as="style">
+    <link rel="preload" href="js/main.js" as="script">
+    <link rel="preload" href="js/performance.js" as="script">
+    <link rel="preload" href="js/3d-text-effect.js" as="script">
+    <link rel="preload" href="js/interactive-particles.js" as="script">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="manifest" href="/manifest.json">
+    
     <!-- Favicon -->
     <link rel="icon" href="assets/img/favicon.ico">
+    <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+    
+    <!-- Critical CSS inline pour un affichage instantané -->
+    <style>
+        /* Critical CSS pour le rendu initial */
+        body, html { margin: 0; padding: 0; font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif; background-color: #0a192f; color: #e6f1ff; }
+        .preloader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a192f; z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.5s ease, visibility 0.5s ease; }
+        .preloader.hidden { opacity: 0; visibility: hidden; }
+        .loader { text-align: center; }
+        .logo-animation { width: 100px; height: 100px; }
+        .logo-text { fill: #64ffda; font-size: 24px; font-weight: bold; }
+        .circle { stroke: #64ffda; stroke-dasharray: 283; stroke-dashoffset: 283; animation: circle-anim 2s ease-in-out forwards; }
+        @keyframes circle-anim { to { stroke-dashoffset: 0; } }
+        .loading-text { color: #64ffda; margin-top: 20px; font-size: 16px; letter-spacing: 1px; }
+        .dots { animation: dots 1.5s infinite; }
+        @keyframes dots { 0%, 20% { content: '.'; } 40% { content: '..'; } 60%, 100% { content: '...'; } }
+        .page-transition-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #0a192f; z-index: 9998; transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.65, 0, 0.35, 1); }
+    </style>
     
     <!-- CSS Files -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/animations.css">
     <link rel="stylesheet" href="css/responsive.css">
     
-    <!-- Font Awesome pour les icônes -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Font Awesome pour les icônes (chargement différé) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"></noscript>
     
-    <!-- GSAP pour les animations avancées -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <!-- GSAP pour les animations avancées (chargement asynchrone) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" async></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" async></script>
+    
+    <!-- Performance Optimizer (chargé en priorité) -->
+    <script src="js/performance.js"></script>
 </head>
 <body class="page-home">
     <!-- Overlay de transition entre les pages -->
@@ -191,9 +225,15 @@
         </div>
     </footer>
     
+    <!-- Canvas pour les particules interactives -->
+    <canvas id="particles-canvas" class="particles-canvas"></canvas>
+    
     <!-- Scripts -->
+    <script src="js/performance.js"></script>
     <script src="js/main.js"></script>
     <script src="js/particles.js"></script>
     <script src="js/homepage.js"></script>
+    <script src="js/3d-text-effect.js"></script>
+    <script src="js/interactive-particles.js"></script>
 </body>
 </html>
