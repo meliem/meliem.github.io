@@ -1,7 +1,8 @@
 /**
- * Animations spécifiques à la page d'accueil - Version optimisée
+ * Animations spécifiques à la page d'accueil - Version optimisée et améliorée
  * Effets visuels avancés pour créer une expérience immersive
- * avec une meilleure gestion des performances
+ * avec une meilleure gestion des performances et compatibilité multi-appareils
+ * Version 2.0 - Optimisations et nouvelles animations
  */
 
 // Vérifier si les gestionnaires d'état sont disponibles
@@ -35,6 +36,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (HomepageAnimations.animationsInitialized) return;
     HomepageAnimations.animationsInitialized = true;
     
+    // Attendre un court délai pour permettre au préchargeur de se terminer
+    setTimeout(() => {
+    
     try {
         // Initialiser GSAP si disponible
         if (typeof gsap !== 'undefined') {
@@ -58,6 +62,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Initialiser l'effet glitch du titre (version simplifiée sur mobile)
         initGlitchEffect();
         
+        // Initialiser les animations de fade-in pour les sections de contenu
+        initContentFadeInAnimations();
+        
         // S'intégrer avec AppState pour le nettoyage lors de la navigation
         if (hasAppState) {
             const originalCleanup = AppState.removeAllEventListeners;
@@ -69,6 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (error) {
         console.error('Erreur lors de l\'initialisation des animations de la page d\'accueil:', error);
     }
+    }, 100); // Court délai pour assurer que l'initialisation se fait après l'affichage
 });
 
 /**
@@ -144,7 +152,11 @@ function initGsapAnimations() {
             const navScrollTrigger = ScrollTrigger.create({
                 trigger: '.visual-navigation',
                 start: 'top 85%',
-                onEnter: () => navCardsAnimation.play(),
+                onEnter: () => {
+                    navCardsAnimation.play();
+                    // Ajouter une classe pour activer d'autres effets CSS
+                    document.querySelector('.visual-navigation').classList.add('animated');
+                },
                 once: true // Déclencher une seule fois pour économiser des ressources
             });
             
@@ -191,6 +203,8 @@ function initGsapAnimations() {
  * Initialise les animations spécifiques à la section hero avec performances optimisées
  */
 function initHeroAnimations() {
+    // Vérifier si l'élément existe avant d'initialiser les animations
+    if (!document.querySelector('.hero-content')) return;
     try {
         // Vérifier si nous sommes en mode économie d'énergie
         const isLowPowerMode = hasPerformanceManager && PerformanceManager.lowPowerMode;
@@ -296,6 +310,8 @@ function initHeroAnimations() {
  * Initialise les animations des cartes de navigation avec performances optimisées
  */
 function initNavCardsAnimation() {
+    // Vérifier si l'élément existe avant d'initialiser les animations
+    if (!document.querySelector('.nav-cards')) return;
     try {
         const navCards = document.querySelectorAll('.nav-card');
         if (!navCards.length) return;
@@ -425,6 +441,9 @@ function addStyleAndReturnCleanup(styleText) {
  * Initialise l'effet de flux de données avec optimisations de performance
  */
 function initDataFlowEffect() {
+    // Vérifier si l'élément existe avant d'initialiser l'effet
+    const dataFlow = document.querySelector('.data-flow');
+    if (!dataFlow) return;
     try {
         // Vérifier si nous sommes en mode économie d'énergie
         const isLowPowerMode = hasPerformanceManager && PerformanceManager.lowPowerMode;
@@ -544,6 +563,9 @@ function initDataFlowEffect() {
  * Initialise l'effet de circuit imprimé dans l'arrière-plan avec optimisations de performance
  */
 function initCircuitBoardEffect() {
+    // Vérifier si l'élément existe avant d'initialiser l'effet
+    const circuitBoard = document.querySelector('.circuit-board');
+    if (!circuitBoard) return;
     try {
         // Vérifier si nous sommes en mode économie d'énergie
         const isLowPowerMode = hasPerformanceManager && PerformanceManager.lowPowerMode;
@@ -683,6 +705,8 @@ function initCircuitBoardEffect() {
  * Initialise l'effet glitch du titre avec optimisations de performance
  */
 function initGlitchEffect() {
+    // Vérifier si l'élément existe avant d'initialiser l'effet
+    if (!document.querySelector('.typed-text')) return;
     try {
         // Vérifier si nous sommes en mode économie d'énergie
         const isLowPowerMode = hasPerformanceManager && PerformanceManager.lowPowerMode;
@@ -914,5 +938,127 @@ function initGlitchEffect() {
     
     } catch (error) {
         console.error('Erreur dans l\'effet glitch:', error);
+    }
+}
+
+/**
+ * Initialise les animations de fade-in progressif pour les sections de contenu
+ * Ces animations sont légères et performantes, avec désactivation automatique sur les appareils à faible performance
+ */
+function initContentFadeInAnimations() {
+    try {
+        // Vérifier si nous sommes en mode économie d'énergie
+        const isLowPowerMode = hasPerformanceManager && PerformanceManager.lowPowerMode;
+        if (isLowPowerMode) return; // Ne pas initialiser sur les appareils à faible performance
+        
+        // Vérifier que GSAP et ScrollTrigger sont disponibles
+        if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+        
+        // Sélectionner les sections à animer
+        const contentSections = document.querySelectorAll('.visual-navigation, .featured-projects, .testimonials');
+        if (!contentSections.length) return;
+        
+        // Créer des animations pour chaque section
+        contentSections.forEach((section, index) => {
+            // Sélectionner les éléments internes à animer
+            const titleElement = section.querySelector('.section-title');
+            const contentElements = section.querySelectorAll('.section-title ~ *:not(.section-title):not(.underline)');
+            
+            // Animation du titre
+            if (titleElement) {
+                gsap.set(titleElement, { opacity: 0, y: 30 });
+                
+                const titleAnim = gsap.to(titleElement, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.8,
+                    ease: 'power2.out',
+                    paused: true
+                });
+                
+                // Créer un ScrollTrigger pour cette animation
+                const titleTrigger = ScrollTrigger.create({
+                    trigger: section,
+                    start: 'top 80%',
+                    onEnter: () => titleAnim.play(),
+                    once: true
+                });
+                
+                // Enregistrer pour nettoyage
+                HomepageAnimations.registerAnimation({
+                    cleanup: () => {
+                        if (titleTrigger) titleTrigger.kill();
+                        if (titleAnim) titleAnim.kill();
+                    }
+                });
+            }
+            
+            // Animation des éléments de contenu avec stagger
+            if (contentElements.length) {
+                gsap.set(contentElements, { opacity: 0, y: 40 });
+                
+                const contentAnim = gsap.to(contentElements, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.7,
+                    stagger: 0.15,
+                    ease: 'power2.out',
+                    paused: true
+                });
+                
+                // Créer un ScrollTrigger pour cette animation
+                const contentTrigger = ScrollTrigger.create({
+                    trigger: section,
+                    start: 'top 75%',
+                    onEnter: () => contentAnim.play(),
+                    once: true
+                });
+                
+                // Enregistrer pour nettoyage
+                HomepageAnimations.registerAnimation({
+                    cleanup: () => {
+                        if (contentTrigger) contentTrigger.kill();
+                        if (contentAnim) contentAnim.kill();
+                    }
+                });
+            }
+        });
+        
+        // Animer le footer avec un délai plus important
+        const footer = document.querySelector('footer');
+        if (footer) {
+            const footerElements = footer.querySelectorAll('.footer-content > *, .footer-bottom > *');
+            
+            if (footerElements.length) {
+                gsap.set(footerElements, { opacity: 0, y: 20 });
+                
+                const footerAnim = gsap.to(footerElements, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.5,
+                    stagger: 0.1,
+                    ease: 'power1.out',
+                    paused: true
+                });
+                
+                // Créer un ScrollTrigger avec un déclenchement plus bas
+                const footerTrigger = ScrollTrigger.create({
+                    trigger: footer,
+                    start: 'top 90%',
+                    onEnter: () => footerAnim.play(),
+                    once: true
+                });
+                
+                // Enregistrer pour nettoyage
+                HomepageAnimations.registerAnimation({
+                    cleanup: () => {
+                        if (footerTrigger) footerTrigger.kill();
+                        if (footerAnim) footerAnim.kill();
+                    }
+                });
+            }
+        }
+    } catch (error) {
+        console.error('Erreur dans les animations de fade-in:', error);
     }
 }

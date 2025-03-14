@@ -1,7 +1,8 @@
 /**
- * Système de particules interactives avancé
+ * Système de particules interactives avancé - Version 2.0
  * Réagit aux mouvements de la souris/toucher et crée des effets visuels impressionnants
- * Optimisé pour les performances avec adaptation automatique
+ * Optimisé pour les performances avec adaptation automatique et effet visuel amélioré
+ * Inclut des variations de couleur, effets de profondeur et réactivité accrue
  */
 
 class InteractiveParticles {
@@ -164,55 +165,76 @@ class InteractiveParticles {
     }
 
     /**
-     * Crée les particules du système
+     * Crée les particules du système avec des propriétés améliorées pour l'effet visuel
      */
     createParticles() {
         for (let i = 0; i < this.options.maxParticles; i++) {
+            // Générer la couleur et la profondeur
+            const colorData = this.generateParticleColor();
+            
+            // Ajuster la taille en fonction de la profondeur (effet de perspective)
+            const sizeMultiplier = 0.5 + colorData.z * 1.5; // Les particules plus proches sont plus grandes
+            const baseSize = Math.random() * this.options.particleSize + 1;
+            
+            // Ajuster la vitesse en fonction de la profondeur (effet de parallaxe)
+            const speedMultiplier = 0.3 + colorData.z * 0.7; // Les particules plus proches semblent bouger plus vite
+            
             this.particles.push({
                 x: Math.random() * this.canvas.clientWidth,
                 y: Math.random() * this.canvas.clientHeight,
-                size: Math.random() * this.options.particleSize + 1,
-                speedX: (Math.random() - 0.5) * this.options.speed,
-                speedY: (Math.random() - 0.5) * this.options.speed,
-                color: this.generateParticleColor(),
+                z: colorData.z, // Ajouter une coordonnée Z pour la profondeur
+                size: baseSize * sizeMultiplier,
+                baseSize: baseSize, // Garder la taille de base pour les animations
+                speedX: (Math.random() - 0.5) * this.options.speed * speedMultiplier,
+                speedY: (Math.random() - 0.5) * this.options.speed * speedMultiplier,
+                color: colorData.color,
+                glowIntensity: colorData.glowIntensity,
                 opacity: Math.random() * 0.5 + 0.3,
                 hovered: false,
-                life: 1.0 // Pour les particules de trace de mouvement
+                pulsePhase: Math.random() * Math.PI * 2, // Phase aléatoire pour l'effet de pulsation
+                pulseSpeed: Math.random() * 0.02 + 0.01, // Vitesse de pulsation unique par particule
+                life: 1.0, // Pour les particules de trace de mouvement
+                originalSpeedX: 0, // Vitesse d'origine pour revenir après l'interaction
+                originalSpeedY: 0  // Vitesse d'origine pour revenir après l'interaction
             });
         }
     }
 
     /**
-     * Génère une couleur légèrement variée pour chaque particule
+     * Génère une couleur variée pour chaque particule avec plus de diversité visuelle
+     * @returns {string} Couleur au format rgba
      */
     generateParticleColor() {
-        // Si la couleur est au format hexadécimal, la convertir en RGB
-        let r, g, b;
+        // Palette de couleurs complémentaires pour plus de richesse visuelle
+        const colorPalette = [
+            [100, 255, 218], // #64ffda - Couleur principale
+            [120, 220, 232], // Variation cyan
+            [80, 200, 255],  // Variation bleu clair
+            [134, 202, 179], // Variation vert-eau
+            [150, 240, 200]  // Variation vert clair
+        ];
         
-        if (this.options.particleColor.startsWith('#')) {
-            const hex = this.options.particleColor.substring(1);
-            r = parseInt(hex.substring(0, 2), 16);
-            g = parseInt(hex.substring(2, 4), 16);
-            b = parseInt(hex.substring(4, 6), 16);
-        } else if (this.options.particleColor.startsWith('rgb')) {
-            const rgb = this.options.particleColor.match(/\d+/g);
-            r = parseInt(rgb[0]);
-            g = parseInt(rgb[1]);
-            b = parseInt(rgb[2]);
-        } else {
-            // Couleur par défaut si le format n'est pas reconnu
-            r = 100;
-            g = 255;
-            b = 218;
-        }
+        // Sélectionner une couleur de base de la palette (avec forte probabilité pour la couleur principale)
+        const colorIndex = Math.random() < 0.7 ? 0 : Math.floor(Math.random() * colorPalette.length);
+        let [r, g, b] = colorPalette[colorIndex];
         
-        // Ajouter une petite variation
-        const variation = 30;
-        r = Math.max(0, Math.min(255, r + (Math.random() - 0.5) * variation));
-        g = Math.max(0, Math.min(255, g + (Math.random() - 0.5) * variation));
-        b = Math.max(0, Math.min(255, b + (Math.random() - 0.5) * variation));
+        // Ajouter une variation subtile pour créer plus de nuances
+        const variance = 15;
+        r = Math.max(0, Math.min(255, r + (Math.random() - 0.5) * variance));
+        g = Math.max(0, Math.min(255, g + (Math.random() - 0.5) * variance));
+        b = Math.max(0, Math.min(255, b + (Math.random() - 0.5) * variance));
         
-        return `rgb(${Math.floor(r)}, ${Math.floor(g)}, ${Math.floor(b)})`;
+        // Créer un effet de profondeur avec des opacités variables selon la position Z
+        // Les particules plus proches (z plus élevé) sont plus lumineuses
+        const depth = Math.random();
+        const opacity = depth * 0.5 + 0.3; // Entre 0.3 et 0.8
+        
+        return {
+            color: `rgba(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)}, ${opacity})`,
+            z: depth, // Stocker la profondeur pour les calculs de taille et vitesse
+            glowIntensity: Math.random() * 0.8 + 0.2 // Variation d'intensité pour l'effet de lueur
+        };
+    }
     }
 
     /**
