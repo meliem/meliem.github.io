@@ -38,6 +38,7 @@ class InteractiveParticles {
         this.touchMode = 'ontouchstart' in window;
         this.lastThrottleTime = 0;
         this.lastPerformanceAdjustTime = 0;
+        this.lastTrailTime = 0; // Pour limiter la fréquence de création des traces
         this.fps = 60;
         this.framesCount = 0;
         this.lastFpsUpdateTime = 0;
@@ -316,6 +317,7 @@ class InteractiveParticles {
 
     /**
      * Crée une trace de particules suivant le mouvement de la souris
+     * Version optimisée avec réduction de l'agressivité lors de mouvements rapides
      */
     createMotionTrail() {
         // Ne pas créer de traces si la souris ne se déplace pas assez vite
@@ -324,29 +326,38 @@ class InteractiveParticles {
             this.mouseSpeed.y * this.mouseSpeed.y
         );
         
-        if (mouseSpeed < 3) return;
+        // Augmenter le seuil minimum pour éviter les déclenchements trop fréquents
+        if (mouseSpeed < 5) return;
         
-        // Calculer le nombre de particules à créer en fonction de la vitesse
-        const particlesToCreate = Math.min(5, Math.floor(mouseSpeed / 5));
+        // Limiter la vitesse effective pour éviter des comportements extrêmes
+        const cappedSpeed = Math.min(mouseSpeed, 30);
+        
+        // Throttling pour éviter trop de particules en mouvement rapide
+        const now = Date.now();
+        if (now - this.lastTrailTime < 50) return; // Limiter à 20 mises à jour par seconde max
+        this.lastTrailTime = now;
+        
+        // Calculer le nombre de particules à créer en fonction de la vitesse avec un plafond plus bas
+        const particlesToCreate = Math.min(3, Math.floor(cappedSpeed / 10));
         
         // Remplacer certaines particules existantes par des particules de trace
         for (let i = 0; i < particlesToCreate; i++) {
             // Trouver une particule à remplacer
             const particleIndex = Math.floor(Math.random() * this.particles.length);
             
-            // Position légèrement aléatoire autour du curseur
-            const offsetX = (Math.random() - 0.5) * 10;
-            const offsetY = (Math.random() - 0.5) * 10;
+            // Position légèrement aléatoire autour du curseur avec moins de dispersion
+            const offsetX = (Math.random() - 0.5) * 8;
+            const offsetY = (Math.random() - 0.5) * 8;
             
-            // Remplacer la particule
+            // Remplacer la particule avec des vitesses réduites pour éviter les mouvements brusques
             this.particles[particleIndex] = {
                 x: this.mousePosition.x + offsetX,
                 y: this.mousePosition.y + offsetY,
-                size: Math.random() * this.options.particleSize * 2 + 1,
-                speedX: this.mouseSpeed.x * 0.1 * (Math.random() - 0.5),
-                speedY: this.mouseSpeed.y * 0.1 * (Math.random() - 0.5),
+                size: Math.random() * this.options.particleSize * 1.5 + 1, // Taille légèrement réduite
+                speedX: this.mouseSpeed.x * 0.05 * (Math.random() - 0.5), // Vitesse réduite de moitié
+                speedY: this.mouseSpeed.y * 0.05 * (Math.random() - 0.5), // Vitesse réduite de moitié
                 color: this.generateParticleColor(),
-                opacity: 0.8,
+                opacity: 0.7, // Légèrement moins visible
                 hovered: true,
                 life: 1.0
             };

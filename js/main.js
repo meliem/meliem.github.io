@@ -380,19 +380,39 @@ function initPageSpecificFeatures() {
 
 /**
  * Initialise l'effet de frappe pour la page d'accueil
+ * Version améliorée avec meilleure robustesse et diagnostics
  */
 function initTypingEffect() {
     const typedTextElement = document.querySelector('.typed-text');
     
-    if (!typedTextElement) return;
+    // Vérification plus robuste de l'élément
+    if (!typedTextElement) {
+        console.warn('L\'effet de frappe n\'a pas pu être initialisé - élément .typed-text non trouvé');
+        return;
+    }
     
+    // S'assurer que l'élément est visible et a la bonne taille
+    typedTextElement.style.minHeight = '1.2em';
+    typedTextElement.style.display = 'inline-block';
+    
+    // Définir les textes à afficher
     const textArray = ['Data Engineer', 'Développeur', 'Électronicien', 'Spécialiste Cybersécurité'];
     let textIndex = 0;
     let charIndex = 0;
     let isDeleting = false;
     let typingDelay = 100;
     
+    // Mettre un texte initial pour éviter l'effet de vide
+    typedTextElement.textContent = '';
+    
+    // Fonction de frappe avec sécurité intégrée
     function type() {
+        // Vérifier que l'élément existe toujours (par sécurité)
+        if (!document.body.contains(typedTextElement)) {
+            console.warn('L\'effet de frappe a été interrompu - élément .typed-text supprimé');
+            return;
+        }
+        
         const currentText = textArray[textIndex];
         
         if (isDeleting) {
@@ -419,11 +439,15 @@ function initTypingEffect() {
             typingDelay = 300;
         }
         
+        // Programmer la prochaine itération
         setTimeout(type, typingDelay);
     }
     
-    // Démarrer l'effet de frappe
-    setTimeout(type, 1000);
+    // Démarrer l'effet de frappe avec un délai réduit pour une réactivité accrue
+    setTimeout(type, 500);
+    
+    // Journaliser pour le diagnostic
+    console.log('Effet de frappe initialisé avec succès');
 }
 
 /**
